@@ -4,20 +4,18 @@ import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.PWA;
 
-@Route
-@PWA(name = "Test Application", shortName = "Test App", description = "This is a test website for Qars.", enableInstallPrompt = false)
+@Route("Register")
 @CssImport("./styles/styles.css")
-public class MainView extends VerticalLayout {
-
-    public MainView() {
+public class Register extends VerticalLayout {
+    public Register() {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         setSizeFull();
-        addClassName("main-view");
+        addClassName("register");
         
         // Header
         H1 header = new H1("QARS");
@@ -55,5 +53,9 @@ public class MainView extends VerticalLayout {
         miRegister.addClickListener(e -> miRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
         add(header);
         add(menuBar);
+
+        H2 pageName = new H2("Register");
+        pageName.getElement().getThemeList();
+        add(pageName);
     }
 }
