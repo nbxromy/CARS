@@ -42,11 +42,6 @@ public class MainView extends VerticalLayout {
         MenuItem miRentInformation = smRent.addItem("Information");
         MenuItem miExtras = smRent.addItem("Extra options");
         
-        /*SubMenu smLocations = miLocations.getSubMenu();
-        MenuItem miAmsterdam = smLocations.addItem("Amsterdam");
-        MenuItem miRotterdam = smLocations.addItem("Rotterdam");
-        MenuItem miUtrecht = smLocations.addItem("Utrecht");*/
-
         SubMenu smLogin = miLogin.getSubMenu();
         MenuItem miRegister = smLogin.addItem("Register");
 

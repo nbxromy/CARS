@@ -2,13 +2,15 @@
     background-color: #3e6d7a;
     color: #ffffff;
     float: left;
-    margin: 0;
+    margin: 0px;
     padding: 20px;
     width: 100%;
 }
 
-.menuBar {
-    background-color: #f0f4f5;
-    padding-left: 500px;
+.main-view .menuBar {
+    background-color: #f5f5f5;
+    float: center;
+    margin: 0px;
+    padding-left: 35px;
     width: 100%;
 }
