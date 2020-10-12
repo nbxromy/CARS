@@ -1,0 +1,14 @@
+.main-view H1 {
+    background-color: #3e6d7a;
+    color: #ffffff;
+    float: left;
+    margin: 0;
+    padding: 20px;
+    width: 100%;
+}
+
+.menuBar {
+    background-color: #f0f4f5;
+    padding-left: 500px;
+    width: 100%;
+}
