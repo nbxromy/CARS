@@ -5,7 +5,10 @@ import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 
@@ -16,7 +19,18 @@ public class Register extends VerticalLayout {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         setSizeFull();
         addClassName("register");
+        addHeader();
+
+        H2 pageName = new H2("Register");
+        pageName.getElement().getThemeList();
+        add(pageName);
+
         
+        
+    }
+
+    // HEADER
+    public void addHeader() {
         // Header
         H1 header = new H1("QARS");
         header.getElement().getThemeList();
@@ -24,38 +38,35 @@ public class Register extends VerticalLayout {
         // Menu bar 
         MenuBar menuBar = new MenuBar(); 
         menuBar.addClassName("menuBar");
+        menuBar.addThemeVariants(MenuBarVariant.LUMO_PRIMARY);
         menuBar.setOpenOnHover(true);
 
         // Menu bar - Main
-        MenuItem miHome = menuBar.addItem("Home");
-        miHome.addClickListener(e -> miHome.getUI().ifPresent(ui -> ui.navigate("")));
-        MenuItem miRent = menuBar.addItem("Rent");
-        MenuItem miLocations = menuBar.addItem("Locations");
-        //miLocations.addClickListener(e -> miLocations.getUI().ifPresent(ui -> ui.navigate("Locations")));
-        MenuItem miFaq = menuBar.addItem("FAQ");
-        //miFaq.addClickListener(e -> miFaq.getUI().ifPresent(ui -> ui.navigate("FAQ")));
-        MenuItem miCorona = menuBar.addItem("COVID-19");
-        //miCorona.addClickListener(e -> miCorona.getUI().ifPresent(ui -> ui.navigate("Corona")));
-        MenuItem miLogin = menuBar.addItem("Login");
-        //miLogin.addClickListener(e -> miLogin.getUI().ifPresent(ui -> ui.navigate("Login")));
+        MenuItem menuItemHome = menuBar.addItem("Home");
+        menuItemHome.addClickListener(e -> menuItemHome.getUI().ifPresent(ui -> ui.navigate("")));
+        MenuItem menuItemRent = menuBar.addItem("Rent");
+        MenuItem menuItemLocations = menuBar.addItem("Locations");
+        menuItemLocations.addClickListener(e -> menuItemLocations.getUI().ifPresent(ui -> ui.navigate("Locations")));
+        MenuItem menuItemFaq = menuBar.addItem("FAQ");
+        menuItemFaq.addClickListener(e -> menuItemFaq.getUI().ifPresent(ui -> ui.navigate("FAQ")));
+        MenuItem menuItemCorona = menuBar.addItem("COVID-19");
+        menuItemCorona.addClickListener(e -> menuItemCorona.getUI().ifPresent(ui -> ui.navigate("Corona")));
+        MenuItem menuItemLogin = menuBar.addItem("Login");
+        menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
+        menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Login")));
 
         // Menu bar - Sub menu's 
-        SubMenu smRent = miRent.getSubMenu();
-        MenuItem miRentACar = smRent.addItem("Rent a car");
-        //miRentACar.addClickListener(e -> miRentACar.getUI().ifPresent(ui -> ui.navigate("Rent")));
-        MenuItem miRentInformation = smRent.addItem("Information");
-        //miRentInformation.addClickListener(e -> miRentInformation.getUI().ifPresent(ui -> ui.navigate("Information")));
-        MenuItem miExtras = smRent.addItem("Extra options");
-        //miExtras.addClickListener(e -> miExtras.getUI().ifPresent(ui -> ui.navigate("Extras")));
+        SubMenu subMenuRent = menuItemRent.getSubMenu();
+        MenuItem menuItemRentACar = subMenuRent.addItem("Rent a car");
+        menuItemRentACar.addClickListener(e -> menuItemRentACar.getUI().ifPresent(ui -> ui.navigate("Rent")));
+        MenuItem menuItemRentInformation = subMenuRent.addItem("Information");
+        menuItemRentInformation.addClickListener(e -> menuItemRentInformation.getUI().ifPresent(ui -> ui.navigate("Information")));
+        MenuItem menuItemExtras = subMenuRent.addItem("Extra options");
+        menuItemExtras.addClickListener(e -> menuItemExtras.getUI().ifPresent(ui -> ui.navigate("Extras")));
         
-        SubMenu smLogin = miLogin.getSubMenu();
-        MenuItem miRegister = smLogin.addItem("Register");
-        miRegister.addClickListener(e -> miRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
-        add(header);
-        add(menuBar);
-
-        H2 pageName = new H2("Register");
-        pageName.getElement().getThemeList();
-        add(pageName);
+        SubMenu subMenuLogin = menuItemLogin.getSubMenu();
+        MenuItem menuItemRegister = subMenuLogin.addItem("Register");
+        menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
+        add(header, menuBar);
     }
 }
