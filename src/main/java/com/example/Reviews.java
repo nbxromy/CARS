@@ -1,30 +1,67 @@
 package com.example;
 
+import java.util.List;
+
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.PasswordField;
+import com.vaadin.flow.component.textfield.TextArea;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.PWA;
 
-@Route
-@PWA(name = "Test Application", shortName = "Test App", description = "This is a test website for Qars.", enableInstallPrompt = false)
+@Route("Reviews")
 @CssImport("./styles/styles.css")
-public class MainView extends VerticalLayout {
+public class Reviews extends VerticalLayout {
 
-    public MainView() {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
+    public Reviews() {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         setSizeFull();
-        addClassName("home");
+        addClassName("reviews");
         addHeader();
-    
+
+        H2 pageName = new H2("Reviews");
+        pageName.getElement().getThemeList();
+        add(pageName);
+        askReview();
+
     }
 
+    public void askReview() {
+        FormLayout reviewLayout = new FormLayout();
+
+        TextField usernamField = new TextField();
+        usernamField.setLabel("Username");
+        usernamField.setMaxWidth("16em");
+        PasswordField passwordField = new PasswordField();
+        passwordField.setLabel("Password");
+        passwordField.setMaxWidth("16em");
+        TextArea reviewField = new TextArea("Give us a review!");
+        reviewField.setPlaceholder("Write here ...");
+        reviewField.setMaxWidth("30em");
+        Button sendReview = new Button("Send review");
+        reviewLayout.add(usernamField, passwordField, reviewField, sendReview);
+        reviewLayout.setColspan(reviewField, 4);
+     
+        
+        add(reviewLayout);
+    }
     // HEADER
     public void addHeader() {
         // Header
@@ -50,8 +87,6 @@ public class MainView extends VerticalLayout {
         MenuItem menuItemLogin = menuBar.addItem("Login");
         menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
         menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Login")));
-        MenuItem menuItemReview = menuBar.addItem("Reviews");
-        menuItemReview.addClickListener(e -> menuItemReview.getUI().ifPresent(ui -> ui.navigate("Reviews")));
 
         // Menu bar - Sub menu's 
         SubMenu subMenuRent = menuItemRent.getSubMenu();
@@ -66,5 +101,5 @@ public class MainView extends VerticalLayout {
         MenuItem menuItemRegister = subMenuLogin.addItem("Register");
         menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
         add(header, menuBar);
-    }
+    }    
 }
