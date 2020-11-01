@@ -15,6 +15,11 @@ import com.vaadin.flow.router.Route;
 @Route("Register")
 @CssImport("./styles/styles.css")
 public class Register extends VerticalLayout {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
     public Register() {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         setSizeFull();

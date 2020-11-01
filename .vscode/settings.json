@@ -1,0 +1,15 @@
+{
+    "java.configuration.updateBuildConfiguration": "interactive",
+
+"java.project.referencedLibraries": {
+    "include": [
+        "library/**/*.jar",
+        "C:/Users/Gebruiker/Desktop/asd/postgresql-42.2.18.jar",
+        "postgresql-42.2.18.jar"
+    ]
+}
+}
+   
+    
+
+    
