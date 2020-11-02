@@ -20,6 +20,8 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
+import com.example.Application;
+ 
 
 @Route("Reviews")
 @CssImport("./styles/styles.css")
@@ -29,7 +31,7 @@ public class Reviews extends VerticalLayout {
      *
      */
     private static final long serialVersionUID = 1L;
-
+    
     public Reviews() {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         setSizeFull();
@@ -40,6 +42,7 @@ public class Reviews extends VerticalLayout {
         pageName.getElement().getThemeList();
         add(pageName);
         askReview();
+        sendReview("Huss", "testt", "aaaaaaaaaaaaaaaaaaaaa");
 
     }
 
@@ -56,12 +59,25 @@ public class Reviews extends VerticalLayout {
         reviewField.setPlaceholder("Write here ...");
         reviewField.setMaxWidth("30em");
         Button sendReview = new Button("Send review");
+        if(sendReview.isEnabled())
         reviewLayout.add(usernamField, passwordField, reviewField, sendReview);
         reviewLayout.setColspan(reviewField, 4);
-     
+        usernamField.getValue();
         
         add(reviewLayout);
     }
+
+    // Function thatll send the review when the button is pressed.
+    public void sendReview(String usn, String password, String review) {
+        try {
+            Application.insertReviewTable(usn, password, review);
+        } 
+        catch (Exception e) {
+           System.out.println(e);
+        }
+        
+    }
+
     // HEADER
     public void addHeader() {
         // Header
