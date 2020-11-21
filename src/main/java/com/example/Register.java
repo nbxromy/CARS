@@ -2,12 +2,12 @@ package com.example;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.MenuItem;
@@ -27,7 +27,7 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 
-@Route("Register")
+@Route(value="Register")
 @CssImport("./styles/styles.css")
 public class Register extends VerticalLayout {
     private static final long serialVersionUID = 1L;
@@ -43,10 +43,10 @@ public class Register extends VerticalLayout {
         addClassName("register");
         addHeader();
 
+         // Front-end register form
         H2 pageName = new H2("Register");
         pageName.getElement().getThemeList();
 
-        // Front-end register form
         TextField firstnameField = new TextField("First name");
         TextField lastnameField = new TextField("Last name");
         TextField addressField = new TextField("Address");
@@ -135,8 +135,8 @@ public class Register extends VerticalLayout {
             
             // If all credentials are valid, register user
             if (validAge && validUsername && validPasswords && validPhonenumber && validEmail) {
-                error.setText("HOORAY!");
                 register(firstname, lastname, address, birthdate, zip, city, countrycode, email, phonenumber, username, password1);
+                UI.getCurrent().navigate("Login");
             } 
         }    
     }
@@ -163,16 +163,12 @@ public class Register extends VerticalLayout {
     }
 
     // Connect to database and create new user
-    private void register(String firstname, String lastname, String address, LocalDate birthdate, String zip, String city, String countrycode, String email, String phonenumber, String username, String password1) {
+    private void register(String firstname, String lastname, String address, LocalDate birthdate, String zip, String city, String countrycode, String email, String phonenumber, String username, String password1) {       
         try {
             Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
             String sql = "INSERT INTO customers (username, password, givenname, familyname, countrycode, city, address, zip, phonenumber, emailaddress, birthdate) VALUES ('"+username+"', '"+password1+"', '"+firstname+"', '"+lastname+"', '"+countrycode+"', '"+city+"', '"+address+"', '"+zip+"', '"+phonenumber+"', '"+email+"', '"+birthdate+"')";
             Statement statement = connection.createStatement();
             statement.executeUpdate(sql);
-            int rows = statement.executeUpdate(sql);
-            if (rows>0) {
-                System.out.println("New user is registered");
-            }
             connection.close();
         } catch(SQLException e) {
             System.out.println("Error in connecting postgres");

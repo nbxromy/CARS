@@ -1,24 +1,37 @@
 package com.example;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.login.LoginForm;
-import com.vaadin.flow.component.login.LoginI18n;
-import com.vaadin.flow.component.login.AbstractLogin.LoginEvent;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.PasswordField;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 
-@Route("Login")
+@Route(value="Login")
 @CssImport("./styles/styles.css")
 public class Login extends VerticalLayout {
-
+    // Database credentials
+    private String jdbcURL = "jdbc:postgresql://localhost:5432/ProjectC";
+    private String jdbcUsername = "postgres";
+    private String jdbcPassword = "asdf";
 
     public Login() {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
@@ -26,35 +39,96 @@ public class Login extends VerticalLayout {
         addClassName("login");
         addHeader();
 
-        LoginForm loginForm = new LoginForm();
-        loginForm.addLoginListener(credentials -> {
-            boolean isAuthenticated = authenticate(credentials);
-            if (isAuthenticated) {
-                // ** Login user **
+        // Front-end login form 
+        H2 pageName = new H2("Log in");
+        pageName.getElement().getThemeList();
+
+        TextField usernameField = new TextField("User name");
+        PasswordField passwordField = new PasswordField("Password");
+        Span errorMessage = new Span();
+
+        Button loginButton = new Button("Log in");
+        loginButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        FormLayout layout = new FormLayout(pageName, usernameField, passwordField, errorMessage, loginButton);
+        layout.setMaxWidth("300px");
+        layout.getStyle().set("margin", "0 auto");
+        layout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP), new FormLayout.ResponsiveStep("490px", 2, FormLayout.ResponsiveStep.LabelsPosition.TOP));
+        layout.setColspan(pageName, 2);
+        layout.setColspan(errorMessage, 2);
+        layout.setColspan(loginButton, 2);
+
+        errorMessage.getStyle().set("color", "var(--lumo-error-text-color)");
+        errorMessage.getStyle().set("padding", "15px 0");
+        add(layout);
+        loginButton.addClickListener(event -> authenticate(errorMessage, usernameField.getValue(), passwordField.getValue()));
+    }   
+
+    // Check given credentials
+    private void authenticate(Span error, String username, String password) {
+        boolean correctUsername = false;
+        boolean correctPassword = false;
+
+        if (username == "" || password == "") {
+            error.setText("Fill in all fields!");
+        } else {
+            correctUsername = checkUsername(username);
+            if (!correctUsername) {
+                error.setText("Username does not exist");
             } else {
-                loginForm.setError(true);
+                correctPassword = checkPassword(username, password);
+                if (!correctPassword) {
+                    error.setText("Password is not correct");
+                } else {
+                    // To do: CREATE SESSION HERE **** 
+                    UI.getCurrent().navigate("");
+                }
             }
-        });
-        loginForm.setI18n(setLoginFormInformation());
-        add(loginForm);
-
+        }
     }
 
-    private boolean authenticate(LoginEvent credentials) {
-        // ** Check if credentials are correct **
-        return false;
+    // Connect to database and check is username exists
+    private boolean checkUsername(String username) {
+        boolean usernameExists = false;
+        try {
+            Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
+            String sql = "SELECT * FROM customers WHERE username='"+username+"'";
+            Statement statement = connection.createStatement();
+            ResultSet resultset = statement.executeQuery(sql);
+            if (resultset.next()) {
+                usernameExists = true;
+            } else {
+                usernameExists = false;
+            }
+            connection.close();
+        } catch(SQLException e) {
+            System.out.println("Error in connecting postgres");
+            e.printStackTrace();
+        }
+        return usernameExists;
     }
 
-    // EDIT FRONT-END LOGIN FORM
-    private LoginI18n setLoginFormInformation() {
-        final LoginI18n i18n = LoginI18n.createDefault();
-
-        i18n.getForm().setUsername("E-mail");
-        i18n.getErrorMessage().setTitle("Incorrect e-mail or password");
-        i18n.getErrorMessage().setMessage("Check that you have entered the correct e-mail and password and try again.");
-
-        return i18n;
+    // Connect to database and check if combination of the given username and password is correct
+    private boolean checkPassword(String username, String password) {
+        boolean correctPassword = false;
+        try {
+            Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
+            String sql = "SELECT * FROM customers WHERE username='"+username+"' AND password='"+password+"'";
+            Statement statement = connection.createStatement();
+            ResultSet resultset = statement.executeQuery(sql);
+            if (resultset.next()) {
+                correctPassword = true;
+            } else {
+                correctPassword = false;
+            }
+            connection.close();
+        } catch(SQLException e) {
+            System.out.println("Error in connecting postgres");
+            e.printStackTrace();
+        }
+        return correctPassword;
     }
+
 
     // HEADER
     public void addHeader() {
