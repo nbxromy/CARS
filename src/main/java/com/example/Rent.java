@@ -33,12 +33,6 @@ public class Rent extends VerticalLayout {
     private static final long serialVersionUID = 1L;
 
     public Rent() {
-        setDefaultHorizontalComponentAlignment(Alignment.START);
-        setSizeFull();
-        addClassName("register");
-        addHeader();
-
-         // Front-end register form
         H2 title = new H2("Car Overview");
         title.getElement().getThemeList();
         
