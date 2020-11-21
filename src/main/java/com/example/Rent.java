@@ -33,14 +33,24 @@ public class Rent extends VerticalLayout {
     private static final long serialVersionUID = 1L;
 
     public Rent() {
-        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        setDefaultHorizontalComponentAlignment(Alignment.START);
         setSizeFull();
-        addClassName("rent");
+        addClassName("register");
         addHeader();
 
+         // Front-end register form
         H2 title = new H2("Car Overview");
         title.getElement().getThemeList();
+        
+        FormLayout layout = new FormLayout(title);
+        layout.setMaxWidth("500px");
+        layout.getStyle().set("margin","0 auto");
+        layout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP), new FormLayout.ResponsiveStep("490px", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP));
+        layout.setColspan(title, 1);
+
+        add(layout);
     }
+      
 
     // HEADER
     public void addHeader() {
