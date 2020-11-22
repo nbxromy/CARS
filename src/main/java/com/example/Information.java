@@ -1,50 +1,68 @@
 package com.example;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.time.LocalDate;
-
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.PasswordField;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 
-@Route(value="Rent")
+@Route(value="Information")
 @CssImport("./styles/styles.css")
-public class Rent extends VerticalLayout {
+public class Information extends VerticalLayout {
     private static final long serialVersionUID = 1L;
 
-    public Rent() {
-        H2 title = new H2("Car Overview");
-        title.getElement().getThemeList();
-        
-        FormLayout layout = new FormLayout(title);
-        layout.setMaxWidth("500px");
-        layout.getStyle().set("margin","0 auto");
-        layout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP), new FormLayout.ResponsiveStep("490px", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP));
-        layout.setColspan(title, 1);
+    public Information() {
+        setSizeFull();
+        addHeader();
 
-        add(layout);
-    }
-      
+        H2 pageName = new H2("Info Page");
+        pageName.getElement().getThemeList();
+        
+        H3 header = new H3("Welcome to our rental information page!");
+        Span label = new Span("This page is meant to help new users make their first order on our website." + 
+        " The 'Rent a car' page shows all of our current available cars, as well as their status and availability.");
+        Span span = new Span("Our 'Extra options' page is a seperate tab where you can add possible 'extras' to your choice" +
+        ", such as child seats, GPS and/or radio.");
+        H3 newH = new H3("QARS is a company meant to help you");
+        Span sl = new Span("Our dev team at QARS wants to create an application that can be as user-friendly as it should be" + 
+        ", which also means we strive to keep the user happy and make sure their experience using the website/app is one they can be satisfied with." +
+        " Because of that, we believe it to be a good idea to register (by clicking the 'Register' tab under 'Log in') so that the process of choosing, " +
+        "adding and renting one of our vehicles can proceed as smoothly as possible.");
+
+        Image img = new Image("https://www.extremetech.com/wp-content/uploads/2019/12/SONATA-hero-option1-764A5360-edit.jpg", "?");
+        img.setHeight("500px");
+        img.setWidth("700px");
+        Image img2 = new Image("https://www.extremetech.com/wp-content/uploads/2019/12/SONATA-hero-option1-764A5360-edit.jpg", "?");
+        img2.setHeight("200px");
+        img2.setWidth("200px");
+
+        FormLayout layout = new FormLayout();
+        layout.add(pageName);
+        FormLayout l2 = new FormLayout();
+        l2.add(header);
+        FormLayout l3 = new FormLayout();  
+        l3.add(label);
+        FormLayout l4 = new FormLayout();
+        l4.add(span);
+        FormLayout l5 = new FormLayout();
+        l5.add(sl);
+        FormLayout image = new FormLayout(img, img2);
+
+        
+
+        add(layout, l2, l3, l4, image);
+        add(newH, l5);
+        }
 
     // HEADER
     public void addHeader() {
