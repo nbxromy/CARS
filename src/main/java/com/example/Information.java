@@ -46,19 +46,8 @@ public class Information extends VerticalLayout {
         img2.setHeight("200px");
         img2.setWidth("200px");
 
-        FormLayout layout = new FormLayout(pageName);
-        //layout.add(pageName);
-        FormLayout l2 = new FormLayout(header);
-        //l2.add(header);
-        FormLayout l3 = new FormLayout(label);  
-        //l3.add(label);
-        FormLayout l4 = new FormLayout(span);
-        //l4.add(span);
-        FormLayout l5 = new FormLayout(sl);
-        //l5.add(sl);
-        FormLayout image = new FormLayout(img, img2);
-
-        
+        FormLayout layout = new FormLayout(pageName), l2 = new FormLayout(header), l3 = new FormLayout(label);  
+        FormLayout l4 = new FormLayout(span), l5 = new FormLayout(sl), image = new FormLayout(img, img2);
 
         add(layout, l2, l3, l4, image);
         add(newH, l5);
