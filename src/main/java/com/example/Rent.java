@@ -1,6 +1,7 @@
 package com.example;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.charts.model.Label;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -17,47 +18,18 @@ import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 
-@Route(value="Information")
+@Route(value="Rent")
 @CssImport("./styles/styles.css")
-public class Information extends VerticalLayout {
+public class Rent extends VerticalLayout {
     private static final long serialVersionUID = 1L;
 
-    public Information() {
+    public Rent() {
         setSizeFull();
         addHeader();
 
-        H2 pageName = new H2("Info Page");
-        pageName.getElement().getThemeList();
-        
-        H3 header = new H3("Welcome to our rental information page!");
-        Span label = new Span("This page is meant to help new users make their first order on our website." + 
-        " The 'Rent a car' page shows all of our current available cars, as well as their status and availability.");
-        Span span = new Span("Our 'Extra options' page is a seperate tab where you can add possible 'extras' to your choice" +
-        ", such as child seats, GPS and/or radio.");
-        H3 newH = new H3("QARS is a company meant to help you");
-        Span sl = new Span("Our dev team at QARS wants to create an application that can be as user-friendly as it should be" + 
-        ", which also means we strive to keep the user happy and make sure their experience using the website/app is one they can be satisfied with." +
-        " Because of that, we believe it to be a good idea to register (by clicking the 'Register' tab under 'Log in') so that the process of choosing, " +
-        "adding and renting one of our vehicles can proceed as smoothly as possible.");
-        Span link = new Span("You can rent one of our cars by going over to our \"rent a car\" page and clicking on one of the vehicles labeled AVAILABLE. " +
-        "It will then automatically link you to the necessary forms and payment pages");
-
-        Image img = new Image("https://www.extremetech.com/wp-content/uploads/2019/12/SONATA-hero-option1-764A5360-edit.jpg", "?");
-        img.setHeight("500px");
-        img.setWidth("1000px");
-        Image img2 = new Image("https://www.webintravel.com/wp-content/uploads/2019/12/car-rental-sefa-ozel-GettyImages.jpg", "?");
-        img2.setHeight("400px");
-        img2.setWidth("1400px");
-
-
-        FormLayout layout = new FormLayout(pageName), l2 = new FormLayout(header), l3 = new FormLayout(label);  
-        FormLayout l4 = new FormLayout(span), l5 = new FormLayout(sl), l6 = new FormLayout(link);
-
-        Button button = new Button("Click here to go to the rental page");
-        button.addClickListener(e -> button.getUI().ifPresent(ui -> ui.navigate("Rent")));
-
-        add(layout, img2, l2, l3, l4, img);
-        add(newH, l5, l6, button);
+        H2 title = new H2("WELCOME BITCHES");
+        FormLayout lay = new FormLayout(title);
+        add(lay);
         }
 
     // HEADER
