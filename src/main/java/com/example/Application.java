@@ -44,12 +44,13 @@ public class Application extends SpringBootServletInitializer {
 
         try{
             Connection conn = connectDB();
-            PreparedStatement insert = conn.prepareStatement("INSERT INTO reviewtablee (usernam, passw, reviewmssg) VALUES ('"+usn+"', '"+ passw+"', '"+review +"')");
+            PreparedStatement insert = conn.prepareStatement("INSERT INTO reviewtable (username, password, review) VALUES ('"+usn+"', '"+ passw+"', '"+review +"')");
             insert.executeUpdate();
             System.out.println("Inserted");
         }
         catch(Exception e){
             System.out.println(e);
+            
         }
     }
 

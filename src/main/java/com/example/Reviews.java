@@ -1,15 +1,26 @@
 package com.example;
 
+import java.beans.Statement;
+import java.io.ByteArrayInputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.util.List;
 
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
@@ -20,7 +31,9 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamResource;
 import com.example.Application;
+import com.fasterxml.jackson.core.exc.StreamReadException;
  
 
 @Route("Reviews")
@@ -31,43 +44,58 @@ public class Reviews extends VerticalLayout {
      *
      */
     private static final long serialVersionUID = 1L;
+    public String[][] arrayReviews;
+    static String jdbcURL = "jdbc:postgresql://localhost:5432/Test_Project";
+    static String username = "postgres";
+    static String password = "asd";
     
     public Reviews() {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         setSizeFull();
         addClassName("reviews");
         addHeader();
-
-        H2 pageName = new H2("Reviews");
+        retrieveReviews();
+        H2 pageName = new H2("You can write a review on the left and read reviews on the right");
         pageName.getElement().getThemeList();
         add(pageName);
         askReview();
-        sendReview("Huss", "testt", "aaaaaaaaaaaaaaaaaaaaa");
-
+        viewReviews();
+        
     }
-
+ 
+    // Form for writing a review
     public void askReview() {
         FormLayout reviewLayout = new FormLayout();
+        reviewLayout.addClassName("reviewLayout");
+        reviewLayout.setMaxWidth("30em");
 
-        TextField usernamField = new TextField();
-        usernamField.setLabel("Username");
-        usernamField.setMaxWidth("16em");
+        TextField usernameField = new TextField();
+        usernameField.setLabel("Username");
+        usernameField.setMaxWidth("16em");
+
         PasswordField passwordField = new PasswordField();
         passwordField.setLabel("Password");
         passwordField.setMaxWidth("16em");
+
         TextArea reviewField = new TextArea("Give us a review!");
         reviewField.setPlaceholder("Write here ...");
         reviewField.setMaxWidth("30em");
+
         Button sendReview = new Button("Send review");
-        if(sendReview.isEnabled())
-        reviewLayout.add(usernamField, passwordField, reviewField, sendReview);
-        reviewLayout.setColspan(reviewField, 4);
-        usernamField.getValue();
-        
+        sendReview.setMaxWidth("16em");
+        sendReview.addClickListener(click->{
+            sendReview(usernameField.getValue(), passwordField.getValue(), reviewField.getValue());
+           
+          System.out.println("BUTTON CLICKED");
+        });
+
+        reviewLayout.add(usernameField, passwordField, reviewField, sendReview);
+        reviewLayout.setColspan(reviewField, 2);
         add(reviewLayout);
+        
     }
 
-    // Function thatll send the review when the button is pressed.
+    // Function that'll send the review when the button is pressed.
     public void sendReview(String usn, String password, String review) {
         try {
             Application.insertReviewTable(usn, password, review);
@@ -77,8 +105,52 @@ public class Reviews extends VerticalLayout {
         }
         
     }
+    
+    // This function will load the reviews in a accordion
+    public void viewReviews(){
+        
+        Accordion accordion = new Accordion();
+        
+        for(int i=0 ; i<arrayReviews.length;i++){
+            accordion.add(arrayReviews[i][0]+ ""
+            , new Span(arrayReviews[i][1])).addThemeVariants(DetailsVariant.FILLED);
+        }
+        
+        add(accordion);
+       
+    }
 
-    // HEADER
+    // This function will retrieve the amount of rows in the DB reviewtable
+    // and put the data inside arrayReviews.
+    public void retrieveReviews(){
+        try {
+            int index=0;
+            Connection connection = DriverManager.getConnection(jdbcURL, username, password);
+            java.sql.Statement stmt = connection.createStatement();
+            
+            // Amount of rows
+            String query = "select count(*) from reviewtable";
+            ResultSet result = stmt.executeQuery(query);
+            result.next();
+            int count = result.getInt(1);
+            arrayReviews = new String[count][2];
+            
+            // Data to array
+            ResultSet rs = stmt.executeQuery("select * from reviewtable");
+            while(rs.next()){
+                String usn = rs.getString("username");
+                String review = rs.getString("review");
+                arrayReviews[index][0]= usn;
+                arrayReviews[index][1]= review;
+                index++;
+            }  
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
+    }
+
+    // Header, menu bar
     public void addHeader() {
         // Header
         H1 header = new H1("QARS");

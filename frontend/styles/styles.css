@@ -8,6 +8,15 @@
     background-color: #f7f7f7;
 }
 
+.reviewLayout{
+    padding-left: 2em;
+    padding-right: 2em;
+    padding-bottom: 1em;
+    border-style: ridge;
+    
+}
+
+
 /* STYLES ALL PAGES */
 H1 {
     background-color: #2ca2f5;
