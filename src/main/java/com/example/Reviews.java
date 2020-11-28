@@ -1,10 +1,10 @@
 package com.example;
 
-import java.beans.Statement;
 import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.List;
 
 import com.vaadin.flow.component.Component;
@@ -46,9 +46,9 @@ public class Reviews extends VerticalLayout {
     private static final long serialVersionUID = 1L;
     public String[][] arrayReviews;
     static String jdbcURL = "jdbc:postgresql://localhost:5432/Test_Project";
-    static String username = "postgres";
-    static String password = "asd";
-    
+    static String jdbcusername = "postgres";
+    static String jdbcpassword = "asd";
+    public boolean loggedin= false;
     public Reviews() {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         setSizeFull();
@@ -65,6 +65,7 @@ public class Reviews extends VerticalLayout {
  
     // Form for writing a review
     public void askReview() {
+
         FormLayout reviewLayout = new FormLayout();
         reviewLayout.addClassName("reviewLayout");
         reviewLayout.setMaxWidth("30em");
@@ -84,8 +85,14 @@ public class Reviews extends VerticalLayout {
         Button sendReview = new Button("Send review");
         sendReview.setMaxWidth("16em");
         sendReview.addClickListener(click->{
-            sendReview(usernameField.getValue(), passwordField.getValue(), reviewField.getValue());
-           
+            if(checkUser(usernameField.getValue(), passwordField.getValue())){
+                sendReview(usernameField.getValue(), passwordField.getValue(), reviewField.getValue());
+            }
+            else{
+                System.out.println("Credentials are wrong");
+            }
+            
+            
           System.out.println("BUTTON CLICKED");
         });
 
@@ -95,8 +102,34 @@ public class Reviews extends VerticalLayout {
         
     }
 
+
+    // Function that'll check if the username and password are correct
+    public boolean checkUser(String username, String password){
+        boolean userCred= false;
+
+        try{
+            Connection conn = DriverManager.getConnection(jdbcURL, jdbcusername, jdbcpassword);
+            String query = "select * from customer where username='"+username+"' and password='"+password+"'";
+            Statement stm = conn.createStatement();
+            ResultSet rs = stm.executeQuery(query);
+            if(rs.next()){
+                userCred = true;
+            }
+            else{
+                userCred= false;
+            }
+            conn.close();
+        }
+
+        catch(Exception e){
+            System.out.println(e);
+        }
+        return userCred;
+    }
+
     // Function that'll send the review when the button is pressed.
     public void sendReview(String usn, String password, String review) {
+
         try {
             Application.insertReviewTable(usn, password, review);
         } 
@@ -123,9 +156,10 @@ public class Reviews extends VerticalLayout {
     // This function will retrieve the amount of rows in the DB reviewtable
     // and put the data inside arrayReviews.
     public void retrieveReviews(){
+
         try {
             int index=0;
-            Connection connection = DriverManager.getConnection(jdbcURL, username, password);
+            Connection connection = DriverManager.getConnection(jdbcURL, jdbcusername, jdbcpassword);
             java.sql.Statement stmt = connection.createStatement();
             
             // Amount of rows
@@ -143,8 +177,10 @@ public class Reviews extends VerticalLayout {
                 arrayReviews[index][0]= usn;
                 arrayReviews[index][1]= review;
                 index++;
-            }  
+            } 
+            connection.close(); 
         }
+
         catch(Exception e){
             System.out.println(e);
         }
