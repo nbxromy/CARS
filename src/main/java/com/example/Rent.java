@@ -27,7 +27,7 @@ public class Rent extends VerticalLayout {
         setSizeFull();
         addHeader();
 
-        H2 title = new H2("WELCOME BITCHES");
+        H2 title = new H2("WELCOME!");
         FormLayout lay = new FormLayout(title);
         add(lay);
         }
