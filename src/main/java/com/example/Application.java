@@ -40,11 +40,11 @@ public class Application extends SpringBootServletInitializer {
 
     // Function below will insert data inside the review table.
 
-    public static void insertReviewTable(String usn, String passw, String review) throws Exception{
+    public static void insertReviewTable(String usn, String passw, String review, String star) throws Exception{
 
         try{
             Connection conn = connectDB();
-            PreparedStatement insert = conn.prepareStatement("INSERT INTO reviewtable (username, password, review) VALUES ('"+usn+"', '"+ passw+"', '"+review +"')");
+            PreparedStatement insert = conn.prepareStatement("INSERT INTO reviewtable (username, password, review, star) VALUES ('"+usn+"', '"+ passw+"', '"+review +"','"+ star+"')");
             insert.executeUpdate();
             System.out.println("Inserted");
         }

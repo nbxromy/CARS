@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
@@ -25,13 +26,19 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
+
+
+
 import com.example.Application;
 import com.fasterxml.jackson.core.exc.StreamReadException;
  
@@ -42,13 +49,14 @@ public class Reviews extends VerticalLayout {
 
     /**
      *
-     */
+     */ 
     private static final long serialVersionUID = 1L;
-    public String[][] arrayReviews;
+    private String[][] arrayReviews;
     static String jdbcURL = "jdbc:postgresql://localhost:5432/Test_Project";
     static String jdbcusername = "postgres";
     static String jdbcpassword = "asd";
     public boolean loggedin= false;
+
     public Reviews() {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         setSizeFull();
@@ -66,8 +74,13 @@ public class Reviews extends VerticalLayout {
     // Form for writing a review
     public void askReview() {
 
+        // Todo: If user is logged in (need credentials for DB table) ->
+        //       different form, without usn/pass
+
         FormLayout reviewLayout = new FormLayout();
         reviewLayout.addClassName("reviewLayout");
+        H2 formHeader = new H2("Write a review here"); 
+        reviewLayout.add(formHeader);
         reviewLayout.setMaxWidth("30em");
 
         TextField usernameField = new TextField();
@@ -82,36 +95,72 @@ public class Reviews extends VerticalLayout {
         reviewField.setPlaceholder("Write here ...");
         reviewField.setMaxWidth("30em");
 
+        TextArea star = new TextArea();
+        star.setLabel("Star rating 1-5");
+        star.setMaxWidth("12em");
+        
+
         Button sendReview = new Button("Send review");
-        sendReview.setMaxWidth("16em");
+        sendReview.setMaxWidth("20em");
+        
+        
         sendReview.addClickListener(click->{
-            if(checkUser(usernameField.getValue(), passwordField.getValue())){
-                sendReview(usernameField.getValue(), passwordField.getValue(), reviewField.getValue());
+            if(!((Integer.parseInt(star.getValue())>=1)&(Integer.parseInt(star.getValue())<=5))){
+                Notification.show("Please use a number 1-5 for star rating", 6000, Position.TOP_CENTER);
+            }
+            else if(checkReview(usernameField.getValue(), passwordField.getValue())){
+                Notification.show("You are only aloud to place one review", 6000, Position.TOP_CENTER);
+            }
+            
+            else if(checkUser(usernameField.getValue(), passwordField.getValue())){
+                sendReview(usernameField.getValue(), passwordField.getValue(), reviewField.getValue(),star.getValue());
+                Notification.show("Review sent!", 6000, Position.TOP_CENTER);
             }
             else{
-                System.out.println("Credentials are wrong");
+                Notification.show("User credentials are wrong, please try again", 6000, Position.TOP_CENTER);
+                
             }
-            
-            
-          System.out.println("BUTTON CLICKED");
+
         });
 
-        reviewLayout.add(usernameField, passwordField, reviewField, sendReview);
+        reviewLayout.add(usernameField, passwordField, reviewField,star ,sendReview);
         reviewLayout.setColspan(reviewField, 2);
         add(reviewLayout);
         
     }
 
+    // Checks if the user already has placed a review
 
-    // Function that'll check if the username and password are correct
+    public boolean checkReview(String usn, String passw){
+        boolean userReview = false;
+        try{
+            Connection conn = DriverManager.getConnection(jdbcURL, jdbcusername, jdbcpassword);
+            String query = "select * from reviewtable where username='"+usn+"' and password='"+passw+"'";
+            Statement statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery(query);
+            if(rs.next()){
+                userReview = true;
+            }
+            else{
+                userReview = false;
+            }
+            conn.close();
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
+        return userReview;
+    }
+
+    // Function that'll check if the username and password are valid in DB
     public boolean checkUser(String username, String password){
         boolean userCred= false;
 
         try{
             Connection conn = DriverManager.getConnection(jdbcURL, jdbcusername, jdbcpassword);
             String query = "select * from customer where username='"+username+"' and password='"+password+"'";
-            Statement stm = conn.createStatement();
-            ResultSet rs = stm.executeQuery(query);
+            Statement statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery(query);
             if(rs.next()){
                 userCred = true;
             }
@@ -127,11 +176,11 @@ public class Reviews extends VerticalLayout {
         return userCred;
     }
 
-    // Function that'll send the review when the button is pressed.
-    public void sendReview(String usn, String password, String review) {
+    // Function that'll send the review to the DB when the button is pressed.
+    public void sendReview(String usn, String password, String review, String star) {
 
         try {
-            Application.insertReviewTable(usn, password, review);
+            Application.insertReviewTable(usn, password, review, star);
         } 
         catch (Exception e) {
            System.out.println(e);
@@ -139,14 +188,13 @@ public class Reviews extends VerticalLayout {
         
     }
     
-    // This function will load the reviews in a accordion
+    // This function will load the reviews in a accordion for view
     public void viewReviews(){
         
         Accordion accordion = new Accordion();
         
         for(int i=0 ; i<arrayReviews.length;i++){
-            accordion.add(arrayReviews[i][0]+ ""
-            , new Span(arrayReviews[i][1])).addThemeVariants(DetailsVariant.FILLED);
+            accordion.add(arrayReviews[i][0]+"  Stars:"+arrayReviews[i][2], new Span(arrayReviews[i][1])).addThemeVariants(DetailsVariant.FILLED);
         }
         
         add(accordion);
@@ -160,22 +208,24 @@ public class Reviews extends VerticalLayout {
         try {
             int index=0;
             Connection connection = DriverManager.getConnection(jdbcURL, jdbcusername, jdbcpassword);
-            java.sql.Statement stmt = connection.createStatement();
+            Statement statement = connection.createStatement();
             
             // Amount of rows
             String query = "select count(*) from reviewtable";
-            ResultSet result = stmt.executeQuery(query);
+            ResultSet result = statement.executeQuery(query);
             result.next();
             int count = result.getInt(1);
-            arrayReviews = new String[count][2];
+            arrayReviews = new String[count][3];
             
             // Data to array
-            ResultSet rs = stmt.executeQuery("select * from reviewtable");
+            ResultSet rs = statement.executeQuery("select * from reviewtable");
             while(rs.next()){
                 String usn = rs.getString("username");
                 String review = rs.getString("review");
+                String star = rs.getString("star");
                 arrayReviews[index][0]= usn;
                 arrayReviews[index][1]= review;
+                arrayReviews[index][2]= star;
                 index++;
             } 
             connection.close(); 
