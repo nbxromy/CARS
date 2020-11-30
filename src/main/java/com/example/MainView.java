@@ -22,6 +22,7 @@ public class MainView extends VerticalLayout {
         setSizeFull();
         addClassName("home");
         addHeader();
+    
     }
 
     // HEADER
@@ -49,6 +50,8 @@ public class MainView extends VerticalLayout {
         MenuItem menuItemLogin = menuBar.addItem("Login");
         menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
         menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Login")));
+        MenuItem menuItemReview = menuBar.addItem("Reviews");
+        menuItemReview.addClickListener(e -> menuItemReview.getUI().ifPresent(ui -> ui.navigate("Reviews")));
 
         // Menu bar - Sub menu's 
         SubMenu subMenuRent = menuItemRent.getSubMenu();

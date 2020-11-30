@@ -22,6 +22,14 @@
 .profile {
     background-color: #f7f7f7;
 } 
+.reviewLayout{
+    padding-left: 2em;
+    padding-right: 2em;
+    padding-bottom: 1em;
+    border-style: ridge;
+    
+}
+
 
 /* STYLES ALL PAGES */
 H1 {
@@ -39,5 +47,7 @@ H1 {
     padding-left: 35px;
     padding-bottom: 10px;
     width: 100%;
+
 }
+
 
