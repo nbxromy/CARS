@@ -28,6 +28,10 @@ public class Rent extends VerticalLayout {
         addHeader();
 
         H2 title = new H2("WELCOME!");
+        Image logo = new Image("https://i.pinimg.com/564x/29/a8/b5/29a8b5bafb290cc02b1e652e694ac328.jpg", "?");
+        logo.setHeight("480px");
+        logo.setMaxWidth("480px");
+
         Span dir = new Span("Please click on one of the following cars to make an order");
         Span ACInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
         "Transmission: Manual, Airconditioning: No");
@@ -93,10 +97,10 @@ public class Rent extends VerticalLayout {
         FormLayout buttons3 = new FormLayout(b5, b6);
         FormLayout Inf3 = new FormLayout(ICTInf, ZCInf);
 
-        FormLayout carimg4 = new FormLayout(OpelMS);
+        FormLayout carimg4 = new FormLayout(OpelMS, logo);
         FormLayout buttons4 = new FormLayout(b7);
         FormLayout Inf4 = new FormLayout(MSInf);
-        
+
 
         add(lay, dir, carimg, Inf1, buttons, 
         carimg2, Inf2, buttons2, carimg3, Inf3, buttons3, carimg4, Inf4, buttons4);
