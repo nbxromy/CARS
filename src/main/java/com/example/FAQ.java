@@ -61,7 +61,7 @@ public class FAQ extends VerticalLayout {
         MenuItem menuItemCorona = menuBar.addItem("COVID-19");
         menuItemCorona.addClickListener(e -> menuItemCorona.getUI().ifPresent(ui -> ui.navigate("Corona")));
         MenuItem menuItemLogin;
-        if (!Application.loggedIn) {
+        if (SessionAttributes.getLoggedIn() == null || SessionAttributes.getLoggedIn() == "false") {
             menuItemLogin = menuBar.addItem("Login");
             menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
             menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Login")));
@@ -81,13 +81,12 @@ public class FAQ extends VerticalLayout {
         menuItemExtras.addClickListener(e -> menuItemExtras.getUI().ifPresent(ui -> ui.navigate("Extras")));
         
         SubMenu subMenuLogin = menuItemLogin.getSubMenu();
-        if (!Application.loggedIn) {
+        if (SessionAttributes.getLoggedIn() == null || SessionAttributes.getLoggedIn() == "false") {
             MenuItem menuItemRegister = subMenuLogin.addItem("Register");
             menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
         } else {
             MenuItem menuItemRegister = subMenuLogin.addItem("Logout");
-            Application.loggedIn = false;
-            Application.loggedUser = "";
+            menuItemRegister.addClickListener(e -> SessionAttributes.logout());
             menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Login")));
         }
         add(header, menuBar);
