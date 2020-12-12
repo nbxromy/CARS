@@ -11,6 +11,7 @@ import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
+import com.example.Admin;
 
 @Route
 @PWA(name = "Test Application", shortName = "Test App", description = "This is a test website for Qars.", enableInstallPrompt = false)
@@ -22,7 +23,8 @@ public class MainView extends VerticalLayout {
         setSizeFull();
         addClassName("home");
         addHeader();
-    
+        
+        
     }
 
     // HEADER
@@ -52,6 +54,16 @@ public class MainView extends VerticalLayout {
         menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Login")));
         MenuItem menuItemReview = menuBar.addItem("Reviews");
         menuItemReview.addClickListener(e -> menuItemReview.getUI().ifPresent(ui -> ui.navigate("Reviews")));
+       
+        if(Admin.getAdmin()){
+            MenuItem menuItemReservation = menuBar.addItem("Admin");
+            menuItemReservation.addClickListener(e -> menuItemReservation.getUI().ifPresent(ui -> ui.navigate("Admin")));
+        }
+        
+        MenuItem menuItemReservation = menuBar.addItem("Employee");
+        menuItemReservation.addClickListener(e -> menuItemReservation.getUI().ifPresent(ui -> ui.navigate("Employee")));
+        
+         
 
         // Menu bar - Sub menu's 
         SubMenu subMenuRent = menuItemRent.getSubMenu();
