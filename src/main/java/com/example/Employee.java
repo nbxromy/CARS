@@ -69,9 +69,14 @@ public class Employee extends VerticalLayout{
             //if
             if(checkForumFields(customerUsername.getValue(), Deliverydate.getValue(), bookingendDate.getValue(), tank.getValue(), carClean.getValue(), carDamages.getValue(), mileage.getValue())){
                 String price =calculatePrice(tank.getValue(), carClean.getValue(), carDamages.getValue(), customerUsername.getValue(), Deliverydate.getValue(),bookingendDate.getValue());
-                getBooking(customerUsername.getValue(), Deliverydate.getValue(), bookingendDate.getValue(),Integer.parseInt(mileage.getValue()));
-                removeBooking(customerUsername.getValue(),Deliverydate.getValue());
-                ui.access(()->Notification.show(price, 10000, Position.TOP_CENTER));
+                if(getBooking(customerUsername.getValue(), Deliverydate.getValue(), bookingendDate.getValue(),Integer.parseInt(mileage.getValue()))){
+                    removeBooking(customerUsername.getValue(),Deliverydate.getValue());
+                    ui.access(()->Notification.show(price, 10000, Position.TOP_CENTER));
+                }
+                else{
+                    Notification.show("Booking not found, check customer username and booking delivery date", 10000, Position.TOP_CENTER);
+                }
+                
             }
         });
         
@@ -190,7 +195,7 @@ public class Employee extends VerticalLayout{
     
     // Gets the needed booking data to move the booking to (finished) bookings.
     // Also updates the car table with the new mileage 
-    public void getBooking(String customerUsername, String deliveryDate, String bookingDate, int newMileage){
+    public boolean getBooking(String customerUsername, String deliveryDate, String bookingDate, int newMileage){
         String license="";
     
         try{
@@ -211,11 +216,16 @@ public class Employee extends VerticalLayout{
                 PreparedStatement updateCar = conn.prepareStatement("UPDATE \"Cars\" SET mileage="+newMileage +" WHERE \"licensePlate\"='"+license+"'");
                 updateCar.executeUpdate();
                 conn.close();
+            }
+            else{
+                return false;
             }       
         }
         catch(Exception e){
             System.out.println("Failed: "+e);
+            return false;
         }
+        return true;
     }
 
     // Calculate if there are extra costs (tank full, car clean, delivering later than booking delivery date)

@@ -60,16 +60,16 @@ public class FAQ extends VerticalLayout {
         menuItemFaq.addClickListener(e -> menuItemFaq.getUI().ifPresent(ui -> ui.navigate("FAQ")));
         MenuItem menuItemCorona = menuBar.addItem("COVID-19");
         menuItemCorona.addClickListener(e -> menuItemCorona.getUI().ifPresent(ui -> ui.navigate("Corona")));
-        MenuItem menuItemLogin;
-        if (!Application.loggedIn) {
-            menuItemLogin = menuBar.addItem("Login");
-            menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
-            menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Login")));
-        } else {
-            menuItemLogin = menuBar.addItem("Profile");
-            menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
-            menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Profile")));
-        }
+        // MenuItem menuItemLogin;
+        // if (!Application.loggedIn) {
+        //     menuItemLogin = menuBar.addItem("Login");
+        //     menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
+        //     menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Login")));
+        // } else {
+        //     menuItemLogin = menuBar.addItem("Profile");
+        //     menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
+        //     menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Profile")));
+        // }
 
         // Menu bar - Sub menu's 
         SubMenu subMenuRent = menuItemRent.getSubMenu();
@@ -80,16 +80,16 @@ public class FAQ extends VerticalLayout {
         MenuItem menuItemExtras = subMenuRent.addItem("Extra options");
         menuItemExtras.addClickListener(e -> menuItemExtras.getUI().ifPresent(ui -> ui.navigate("Extras")));
         
-        SubMenu subMenuLogin = menuItemLogin.getSubMenu();
-        if (!Application.loggedIn) {
-            MenuItem menuItemRegister = subMenuLogin.addItem("Register");
-            menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
-        } else {
-            MenuItem menuItemRegister = subMenuLogin.addItem("Logout");
-            Application.loggedIn = false;
-            Application.loggedUser = "";
-            menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Login")));
-        }
+        // SubMenu subMenuLogin = menuItemLogin.getSubMenu();
+        // if (!Application.loggedIn) {
+        //     MenuItem menuItemRegister = subMenuLogin.addItem("Register");
+        //     menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
+        // } else {
+        //     MenuItem menuItemRegister = subMenuLogin.addItem("Logout");
+        //     Application.loggedIn = false;
+        //     Application.loggedUser = "";
+        //     menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Login")));
+        // }
         add(header, menuBar);
     }
 }
