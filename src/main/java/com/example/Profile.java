@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -13,6 +14,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.html.Div;
@@ -26,8 +28,6 @@ import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.router.Route;
 
 @Route(value="Profile")
@@ -38,10 +38,13 @@ public class Profile extends VerticalLayout {
     private String jdbcUsername = "postgres";
     private String jdbcPassword = "asdf";
 
+    // Date of today
+    private LocalDate today = LocalDate.now();
+
     // Information fields
     private TextField firstnameField = new TextField("First name");
     private TextField lastnameField = new TextField("Last name");
-    private TextField birthdateField = new TextField("Birth date");
+    private DatePicker birthdateField = new DatePicker("Birth date");
 
     private TextField addressField = new TextField("Address");
     private TextField zipField = new TextField("ZIP");
@@ -50,6 +53,9 @@ public class Profile extends VerticalLayout {
 
     private TextField phonenumberField = new TextField("Phone number");
     private TextField emailField = new TextField("E-mail");
+
+    private TextField bsnField = new TextField("BSN");
+    private TextField documentnumberField = new TextField("Document number");
 
     private Span errorMessage = new Span();
     private Span successMessage = new Span();
@@ -77,13 +83,14 @@ public class Profile extends VerticalLayout {
             countrycodeField.setRequired(true);
             phonenumberField.setRequired(true);
             emailField.setRequired(true);
+            bsnField.setRequired(true);
+            documentnumberField.setRequired(true);
 
             // Layout personal information
             HorizontalLayout personalLayout = new HorizontalLayout();
             Icon personalIcon = new Icon(VaadinIcon.USER_STAR);
             personalIcon.setSize("35px");
             personalIcon.setColor("lightblue");
-            birthdateField.setEnabled(false);
             personalLayout.add(personalIcon, firstnameField, lastnameField, birthdateField);
             information.add("Personal Information", personalLayout).addThemeVariants(DetailsVariant.FILLED);
 
@@ -103,22 +110,13 @@ public class Profile extends VerticalLayout {
             contactLayout.add(contactIcon, phonenumberField, emailField);
             information.add("Contact Information", contactLayout).addThemeVariants(DetailsVariant.FILLED);
 
-            // Layout drivers licence upload -- TO DO: Upload drivers licence to database
-            HorizontalLayout uploadLayout = new HorizontalLayout();
+            // Layout drivers licence
+            HorizontalLayout licenceLayout = new HorizontalLayout();
             Icon licenceIcon = new Icon(VaadinIcon.USER_CARD);
             licenceIcon.setSize("35px");
             licenceIcon.setColor("lightblue");
-
-            MemoryBuffer buffer = new MemoryBuffer();
-            Upload upload = new Upload(buffer);
-            Div output = new Div();
-
-            upload.addSucceededListener(event -> {
-                
-            });
-
-            uploadLayout.add(licenceIcon, upload, output);
-            information.add("Drivers Licence", uploadLayout).addThemeVariants(DetailsVariant.FILLED);
+            licenceLayout.add(licenceIcon, bsnField, documentnumberField);
+            information.add("Drivers Licence", licenceLayout).addThemeVariants(DetailsVariant.FILLED);
 
             fillPersonalDetails(SessionAttributes.getLoggedUser());
             
@@ -159,8 +157,8 @@ public class Profile extends VerticalLayout {
             if (resultset.next()) {
                 firstnameField.setValue(resultset.getString("givenname"));
                 lastnameField.setValue(resultset.getString("familyname"));
-                birthdateField.setValue(resultset.getString("birthdate"));
-
+                LocalDate birthdate = LocalDate.parse(resultset.getString("birthdate"));
+                if (resultset.getString("birthdate") != null) { birthdateField.setValue(birthdate); }
                 addressField.setValue(resultset.getString("address"));
                 zipField.setValue(resultset.getString("zip"));
                 cityField.setValue(resultset.getString("city"));
@@ -168,6 +166,11 @@ public class Profile extends VerticalLayout {
 
                 phonenumberField.setValue(resultset.getString("phonenumber"));
                 emailField.setValue(resultset.getString("emailaddress"));
+
+                if (resultset.getString("bsn") != null) { bsnField.setValue(resultset.getString("bsn")); }
+                else { bsnField.setValue(""); }
+                if (resultset.getString("documentnumber") != null) { documentnumberField.setValue(resultset.getString("documentnumber")); }
+                else { documentnumberField.setValue(""); }
             } 
             connection.close();
         } catch(SQLException e) {
@@ -179,13 +182,13 @@ public class Profile extends VerticalLayout {
     // Update personal details in database
     private void updateProfileDetails(String username) {
         // Check if fields are not empty
-        if (firstnameField.isEmpty()|| lastnameField.isEmpty() || birthdateField.isEmpty() || addressField.isEmpty() || zipField.isEmpty() || cityField.isEmpty() || countrycodeField.isEmpty() || phonenumberField.isEmpty() || emailField.isEmpty()) {
+        if (firstnameField.isEmpty()|| lastnameField.isEmpty() || birthdateField.isEmpty() || bsnField.isEmpty() || documentnumberField.isEmpty() || addressField.isEmpty() || zipField.isEmpty() || cityField.isEmpty() || countrycodeField.isEmpty() || phonenumberField.isEmpty() || emailField.isEmpty()) {
             errorMessage.setText("Fill in all fields");
         } else {
             if (specialFieldCheck()) {
                 try {
                     Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
-                    String sql = "UPDATE customers SET givenname='"+firstnameField.getValue()+"', familyname='"+lastnameField.getValue()+"', birthdate='"+birthdateField.getValue()+"', address='"+addressField.getValue()+"', zip='"+zipField.getValue()+"', city='"+cityField.getValue()+"', countrycode='"+countrycodeField.getValue()+"', phonenumber='"+phonenumberField.getValue()+"', emailaddress='"+emailField.getValue()+"' WHERE username='"+username+"'";
+                    String sql = "UPDATE customers SET givenname='"+firstnameField.getValue()+"', familyname='"+lastnameField.getValue()+"', birthdate='"+birthdateField.getValue()+"', address='"+addressField.getValue()+"', zip='"+zipField.getValue()+"', city='"+cityField.getValue()+"', countrycode='"+countrycodeField.getValue()+"', phonenumber='"+phonenumberField.getValue()+"', emailaddress='"+emailField.getValue()+"', bsn='"+bsnField.getValue()+"', documentnumber='"+documentnumberField.getValue()+"' WHERE username='"+username+"'";
                     Statement statement = connection.createStatement();
                     statement.executeUpdate(sql);
                     errorMessage.setText("");
@@ -201,8 +204,20 @@ public class Profile extends VerticalLayout {
 
     // Validate email and phonenumber inputs
     private boolean specialFieldCheck() {
+        boolean validAge=false;
         boolean validPhonenumber=false;
         boolean validEmail=false;
+        LocalDate birthdate = LocalDate.parse("" + birthdateField.getValue());
+
+        if (birthdate.isAfter(today)) {
+            errorMessage.setText("Enter a valid age");
+            validAge = false;
+        } else if (birthdate.plusYears(21).isAfter(today)) {
+            errorMessage.setText("You need to be at least 21 years old to rent a car");
+            validAge = false;
+        } else {
+            validAge = true;
+        }
 
         if (phonenumberField.getValue().matches("^[0-9]{10}$")) {
             validPhonenumber=true;
@@ -218,7 +233,7 @@ public class Profile extends VerticalLayout {
             errorMessage.setText("Enter a valid email");
         } 
 
-        if (validPhonenumber && validEmail) {
+        if (validAge && validPhonenumber && validEmail) {
             return true;
         } else {
             return false;
@@ -248,6 +263,8 @@ public class Profile extends VerticalLayout {
         menuItemFaq.addClickListener(e -> menuItemFaq.getUI().ifPresent(ui -> ui.navigate("FAQ")));
         MenuItem menuItemCorona = menuBar.addItem("COVID-19");
         menuItemCorona.addClickListener(e -> menuItemCorona.getUI().ifPresent(ui -> ui.navigate("Corona")));
+        MenuItem menuItemReview = menuBar.addItem("Reviews");
+        menuItemReview.addClickListener(e -> menuItemReview.getUI().ifPresent(ui -> ui.navigate("Reviews")));
         MenuItem menuItemLogin;
         if (SessionAttributes.getLoggedIn() == null || SessionAttributes.getLoggedIn() == "false") {
             menuItemLogin = menuBar.addItem("Login");
