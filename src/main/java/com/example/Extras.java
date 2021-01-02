@@ -1,34 +1,40 @@
 package com.example;
 
+//import com.vaadin.flow.component.button.Button;
+//import com.vaadin.flow.component.charts.model.Label;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H2;
+//import com.vaadin.flow.component.html.H3;
+//import com.vaadin.flow.component.html.Image;
+//import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.PWA;
 
-@Route
-@PWA(name = "Test Application", shortName = "Test App", description = "This is a test website for Qars.", enableInstallPrompt = false)
+@Route(value="Extras")
 @CssImport("./styles/styles.css")
-public class MainView extends VerticalLayout {
-
-    /**
-     *
-     */
+public class Extras extends VerticalLayout {
     private static final long serialVersionUID = 1L;
 
-    public MainView() {
-        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+    public Extras() {
         setSizeFull();
-        addClassName("home");
         addHeader();
-    
-    }
+
+        H2 title = new H2("Extra Options");
+
+        FormLayout lay = new FormLayout(title);
+
+        add(lay);
+
+
+        }
 
     // HEADER
     public void addHeader() {
@@ -52,18 +58,9 @@ public class MainView extends VerticalLayout {
         menuItemFaq.addClickListener(e -> menuItemFaq.getUI().ifPresent(ui -> ui.navigate("FAQ")));
         MenuItem menuItemCorona = menuBar.addItem("COVID-19");
         menuItemCorona.addClickListener(e -> menuItemCorona.getUI().ifPresent(ui -> ui.navigate("Corona")));
-        MenuItem menuItemReview = menuBar.addItem("Reviews");
-        menuItemReview.addClickListener(e -> menuItemReview.getUI().ifPresent(ui -> ui.navigate("Reviews")));
-        MenuItem menuItemLogin;
-        if (SessionAttributes.getLoggedIn() == null || SessionAttributes.getLoggedIn() == "false") {
-            menuItemLogin = menuBar.addItem("Login");
-            menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
-            menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Login")));
-        } else {
-            menuItemLogin = menuBar.addItem("Profile");
-            menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
-            menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Profile")));
-        }
+        MenuItem menuItemLogin = menuBar.addItem("Login");
+        menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
+        menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Login")));
 
         // Menu bar - Sub menu's 
         SubMenu subMenuRent = menuItemRent.getSubMenu();
@@ -75,14 +72,8 @@ public class MainView extends VerticalLayout {
         menuItemExtras.addClickListener(e -> menuItemExtras.getUI().ifPresent(ui -> ui.navigate("Extras")));
         
         SubMenu subMenuLogin = menuItemLogin.getSubMenu();
-        if (SessionAttributes.getLoggedIn() == null || SessionAttributes.getLoggedIn() == "false") {
-            MenuItem menuItemRegister = subMenuLogin.addItem("Register");
-            menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
-        } else {
-            MenuItem menuItemRegister = subMenuLogin.addItem("Logout");
-            menuItemRegister.addClickListener(e -> SessionAttributes.logout());
-            menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Login")));
-        }
+        MenuItem menuItemRegister = subMenuLogin.addItem("Register");
+        menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
         add(header, menuBar);
     }
 }
