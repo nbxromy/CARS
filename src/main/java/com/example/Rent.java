@@ -1,5 +1,6 @@
 package com.example;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 //import com.vaadin.flow.component.charts.model.Label;
 import com.vaadin.flow.component.contextmenu.MenuItem;
@@ -53,36 +54,43 @@ public class Rent extends VerticalLayout {
         OpelAC.setHeight("480px");
         OpelAC.setMaxWidth("700px");
         Button b1 = new Button("Rent this car");
+        b1.addClickListener(e -> UI.getCurrent().navigate("Extras"));
 
         Image OpelCB = new Image("https://www.autozine.nl/cache/nieuws/336/13032_1.jpg", "?");
         OpelCB.setHeight("480px");
         OpelCB.setMaxWidth("700px");
         Button b2 = new Button("Rent this car");
+        b2.addClickListener(e -> UI.getCurrent().navigate("Extras"));
 
         Image OpelMC = new Image("https://cdn.autowereld.nl/I477815795/640x0/opel-meriva-1-4-turbo-ecotec-120pk-aut-cosmo-ecc-pdc-lmv.jpg", "?");
         OpelMC.setHeight("480px");
         OpelMC.setMaxWidth("700px");
         Button b3 = new Button("Rent this car");
+        b3.addClickListener(e -> UI.getCurrent().navigate("Extras"));
 
         Image OpelAS = new Image("https://www.broekhuis.nl/images/vehicleimages/15624633/600_900/image_1.jpg", "?");
         OpelAS.setHeight("480px");
         OpelAS.setMaxWidth("700px");
         Button b4 = new Button("Rent this car");
+        b4.addClickListener(e -> UI.getCurrent().navigate("Extras"));
 
         Image OpelICT = new Image("https://www.passion4wheels.nl/wp-content/uploads/2013/07/Opel-Insignia-Country-Tourer-286820.jpg", "?");
         OpelICT.setHeight("480px");
         OpelICT.setMaxWidth("700px");
         Button b5 = new Button("Rent this car");
+        b5.addClickListener(e -> UI.getCurrent().navigate("Extras"));
 
         Image OpelZC = new Image("https://i.ebayimg.com/00/s/NzY4WDEwMjQ=/z/ILAAAOSw~kFflBTq/$_85.JPG", "?");
         OpelZC.setHeight("480px");
         OpelZC.setMaxWidth("700px");
         Button b6 = new Button("Rent this car");
+        b6.addClickListener(e -> UI.getCurrent().navigate("Extras"));
 
         Image OpelMS = new Image("https://media.autoweek.nl/m/m1ny1lrbl1fl_480.jpg", "?");
         OpelMS.setHeight("480px");
         OpelMS.setMaxWidth("700px");
         Button b7 = new Button("Rent this car");
+        b7.addClickListener(e -> UI.getCurrent().navigate("Extras"));
 
         FormLayout lay = new FormLayout(title);
         FormLayout carimg = new FormLayout(OpelAC, OpelCB);
