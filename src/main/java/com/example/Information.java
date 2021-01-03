@@ -23,6 +23,7 @@ public class Information extends VerticalLayout {
     private static final long serialVersionUID = 1L;
 
     public Information() {
+        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         setSizeFull();
         addHeader();
 
@@ -53,8 +54,8 @@ public class Information extends VerticalLayout {
         FormLayout layout = new FormLayout(pageName), l2 = new FormLayout(header), l3 = new FormLayout(label);  
         FormLayout l4 = new FormLayout(span), l5 = new FormLayout(sl), l6 = new FormLayout(link);
 
-        Button button = new Button("Click here to go to the rental page");
-        button.addClickListener(e -> button.getUI().ifPresent(ui -> ui.navigate("Rent")));
+        Button button = new Button("Click here to go to the home page");
+        button.addClickListener(e -> button.getUI().ifPresent(ui -> ui.navigate("")));
 
         add(layout, img2, l2, l3, l4, img);
         add(newH, l5, l6, button);
@@ -88,12 +89,8 @@ public class Information extends VerticalLayout {
 
         // Menu bar - Sub menu's 
         SubMenu subMenuRent = menuItemRent.getSubMenu();
-        MenuItem menuItemRentACar = subMenuRent.addItem("Rent a car");
-        menuItemRentACar.addClickListener(e -> menuItemRentACar.getUI().ifPresent(ui -> ui.navigate("Rent")));
         MenuItem menuItemRentInformation = subMenuRent.addItem("Information");
         menuItemRentInformation.addClickListener(e -> menuItemRentInformation.getUI().ifPresent(ui -> ui.navigate("Information")));
-        MenuItem menuItemExtras = subMenuRent.addItem("Extra options");
-        menuItemExtras.addClickListener(e -> menuItemExtras.getUI().ifPresent(ui -> ui.navigate("Extras")));
         
         SubMenu subMenuLogin = menuItemLogin.getSubMenu();
         MenuItem menuItemRegister = subMenuLogin.addItem("Register");

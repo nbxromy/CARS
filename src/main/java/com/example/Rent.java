@@ -1,16 +1,23 @@
 package com.example;
 
-//import com.vaadin.flow.component.button.Button;
-//import com.vaadin.flow.component.charts.model.Label;
+import java.time.LocalDateTime;
+
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.CheckboxGroup;
+import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
+import com.vaadin.flow.component.datetimepicker.DateTimePicker;
+import com.vaadin.flow.component.contextmenu.MenuItem;
+import com.vaadin.flow.component.contextmenu.SubMenu;
+import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
-//import com.vaadin.flow.component.html.H3;
-//import com.vaadin.flow.component.html.Image;
-//import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
@@ -22,19 +29,60 @@ import com.vaadin.flow.router.Route;
 @CssImport("./styles/styles.css")
 public class Rent extends VerticalLayout {
     private static final long serialVersionUID = 1L;
+    public LocalDateTime today = LocalDateTime.now(); 
 
     public Rent() {
+        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         setSizeFull();
         addHeader();
 
         H2 title = new H2("Rent a car");
 
-        FormLayout lay = new FormLayout(title);
+        DateTimePicker pickupDatePicker = new DateTimePicker();
+        pickupDatePicker.setDatePlaceholder("Date");
+        pickupDatePicker.setTimePlaceholder("Time");
+        pickupDatePicker.setLabel("Pick up date");
 
-        add(lay);
+        DateTimePicker dropoffDatePicker = new DateTimePicker();
+        dropoffDatePicker.setDatePlaceholder("Date");
+        dropoffDatePicker.setTimePlaceholder("Time");
+        dropoffDatePicker.setLabel("Drop off date");
 
+        CheckboxGroup<String> checkboxExtras = new CheckboxGroup<>();
+        checkboxExtras.setLabel("Extra");
+        checkboxExtras.setItems("GPS", "Insurance", "Winter tires", "Extra driver", "Childseat");
+        checkboxExtras.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
 
+        Span errorMessage = new Span();
+        errorMessage.getStyle().set("color", "var(--lumo-error-text-color)");
+        errorMessage.getStyle().set("padding", "15px 0");
+
+        Button confirmButton = new Button("Confirm choice and proceed to checkout");
+        confirmButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        confirmButton.addClickListener(e -> checkDates(pickupDatePicker.getValue(), dropoffDatePicker.getValue(), errorMessage));
+
+        Button cancelButton = new Button("Cancel");
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        cancelButton.addClickListener(e -> UI.getCurrent().navigate(""));
+
+        add(title, pickupDatePicker, dropoffDatePicker, checkboxExtras, errorMessage, confirmButton, cancelButton);
+    }
+
+    public void checkDates(LocalDateTime pickupDate, LocalDateTime dropoffDate, Span errorMessage) {  
+        if (pickupDate == null || dropoffDate == null) {
+            errorMessage.setText("Please enter the dates");
+        } else if (pickupDate.isBefore(today)) {
+            errorMessage.setText("Please enter a valid pickup date");
+        } else if (pickupDate.isAfter(today.plusYears(1))) {
+            errorMessage.setText("You can't rent a car for the next year");
+        } else if (dropoffDate.isBefore(pickupDate) || dropoffDate.isBefore(today)) {
+            errorMessage.setText("Please enter a valid dropoff date");
+        } else if (dropoffDate.isAfter(pickupDate.plusMonths(1))) {
+            errorMessage.setText("You can rent a car for a maximum of one month in a row");
+        } else {
+            UI.getCurrent().navigate("Payment");
         }
+    }
 
     // HEADER
     public void addHeader() {
@@ -64,12 +112,8 @@ public class Rent extends VerticalLayout {
 
         // Menu bar - Sub menu's 
         SubMenu subMenuRent = menuItemRent.getSubMenu();
-        MenuItem menuItemRentACar = subMenuRent.addItem("Rent a car");
-        menuItemRentACar.addClickListener(e -> menuItemRentACar.getUI().ifPresent(ui -> ui.navigate("Rent")));
         MenuItem menuItemRentInformation = subMenuRent.addItem("Information");
         menuItemRentInformation.addClickListener(e -> menuItemRentInformation.getUI().ifPresent(ui -> ui.navigate("Information")));
-        MenuItem menuItemExtras = subMenuRent.addItem("Extra options");
-        menuItemExtras.addClickListener(e -> menuItemExtras.getUI().ifPresent(ui -> ui.navigate("Extras")));
         
         SubMenu subMenuLogin = menuItemLogin.getSubMenu();
         MenuItem menuItemRegister = subMenuLogin.addItem("Register");

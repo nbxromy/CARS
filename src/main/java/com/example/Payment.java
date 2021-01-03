@@ -38,8 +38,11 @@ public class Payment extends VerticalLayout {
 
     private Button cancel = new Button("Cancel");
     private Button submit = new Button("Submit");
+    private Button payOnLocation = new Button ("Pay on location");
 
     public Payment() {
+        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        setSizeFull();
         addHeader();
         add(createTitle());
         add(createFormLayout());
@@ -50,6 +53,9 @@ public class Payment extends VerticalLayout {
         });
         submit.addClickListener(e -> {
             Notification.show("Thanks for paying!");
+        });
+        payOnLocation.addClickListener(e -> {
+            Notification.show("Payment pending...");
         });
     }
 
@@ -76,8 +82,8 @@ public class Payment extends VerticalLayout {
         year.setPlaceholder("Year");
         year.setItems(20, 21, 22, 23, 24, 25);
         submit.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonLayout.add(submit);
-        buttonLayout.add(cancel);
+        payOnLocation.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+        buttonLayout.add(submit, payOnLocation, cancel);
         return buttonLayout;
     }
 
@@ -140,12 +146,8 @@ public class Payment extends VerticalLayout {
 
         // Menu bar - Sub menu's 
         SubMenu subMenuRent = menuItemRent.getSubMenu();
-        MenuItem menuItemRentACar = subMenuRent.addItem("Rent a car");
-        menuItemRentACar.addClickListener(e -> menuItemRentACar.getUI().ifPresent(ui -> ui.navigate("Rent")));
         MenuItem menuItemRentInformation = subMenuRent.addItem("Information");
         menuItemRentInformation.addClickListener(e -> menuItemRentInformation.getUI().ifPresent(ui -> ui.navigate("Information")));
-        MenuItem menuItemExtras = subMenuRent.addItem("Extra options");
-        menuItemExtras.addClickListener(e -> menuItemExtras.getUI().ifPresent(ui -> ui.navigate("Extras")));
         
         SubMenu subMenuLogin = menuItemLogin.getSubMenu();
         if (SessionAttributes.getLoggedIn() == null || SessionAttributes.getLoggedIn() == "false") {
