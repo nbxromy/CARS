@@ -8,6 +8,7 @@ import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -35,6 +36,7 @@ public class MainView extends VerticalLayout {
         Image logo = new Image("https://i.pinimg.com/564x/29/a8/b5/29a8b5bafb290cc02b1e652e694ac328.jpg", "?");
         logo.setHeight("480px");
         logo.setMaxWidth("480px");
+        H3 header = new H3("To the QARS rental service!");
 
         Span dir = new Span("Please click on one of the following cars to make an order");
         Span ACInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
@@ -71,7 +73,7 @@ public class MainView extends VerticalLayout {
         Button b3 = new Button("Rent this car");
         b3.addClickListener(e -> UI.getCurrent().navigate("Rent"));
 
-        Image OpelAS = new Image("https://www.broekhuis.nl/images/vehicleimages/15624633/600_900/image_1.jpg", "?");
+        Image OpelAS = new Image("https://dealerimages.dealereprocess.com/image/upload/2090049.jpg", "?");
         OpelAS.setHeight("480px");
         OpelAS.setMaxWidth("700px");
         Button b4 = new Button("Rent this car");
@@ -96,6 +98,7 @@ public class MainView extends VerticalLayout {
         b7.addClickListener(e -> UI.getCurrent().navigate("Rent"));
 
         FormLayout lay = new FormLayout(title);
+        FormLayout lay2 = new FormLayout(header);
         FormLayout carimg = new FormLayout(OpelAC, OpelCB);
         FormLayout buttons = new FormLayout(b1, b2);
         FormLayout Inf1 = new FormLayout(ACInf, CBInf);
@@ -113,8 +116,7 @@ public class MainView extends VerticalLayout {
         FormLayout Inf4 = new FormLayout(MSInf);
 
 
-        add(lay, dir, carimg, Inf1, buttons, 
-        carimg2, Inf2, buttons2, carimg3, Inf3, buttons3, carimg4, Inf4, buttons4);
+        add(lay, lay2, dir, carimg, Inf1, buttons, carimg2, Inf2, buttons2, carimg3, Inf3, buttons3, carimg4, Inf4, buttons4);
     }
 
     // HEADER
