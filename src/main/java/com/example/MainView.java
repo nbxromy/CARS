@@ -73,7 +73,7 @@ public class MainView extends VerticalLayout {
         Button b3 = new Button("Rent this car");
         b3.addClickListener(e -> UI.getCurrent().navigate("Rent"));
 
-        Image OpelAS = new Image("https://www.broekhuis.nl/images/vehicleimages/15624633/600_900/image_1.jpg", "?");
+        Image OpelAS = new Image("https://dealerimages.dealereprocess.com/image/upload/2090049.jpg", "?");
         OpelAS.setHeight("480px");
         OpelAS.setMaxWidth("700px");
         Button b4 = new Button("Rent this car");
@@ -116,8 +116,7 @@ public class MainView extends VerticalLayout {
         FormLayout Inf4 = new FormLayout(MSInf);
 
 
-        add(lay, lay2, dir, carimg, Inf1, buttons, 
-        carimg2, Inf2, buttons2, carimg3, Inf3, buttons3, carimg4, Inf4, buttons4);
+        add(lay, lay2, dir, carimg, Inf1, buttons, carimg2, Inf2, buttons2, carimg3, Inf3, buttons3, carimg4, Inf4, buttons4);
     }
 
     // HEADER
