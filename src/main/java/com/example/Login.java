@@ -28,10 +28,6 @@ import com.vaadin.flow.router.Route;
 @Route(value="Login")
 @CssImport("./styles/styles.css")
 public class Login extends VerticalLayout {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
     // Database credentials
     private String jdbcURL = "jdbc:postgresql://localhost:5432/ProjectC";
     private String jdbcUsername = "postgres";

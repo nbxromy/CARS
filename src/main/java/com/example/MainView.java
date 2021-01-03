@@ -17,11 +17,6 @@ import com.vaadin.flow.server.PWA;
 @CssImport("./styles/styles.css")
 public class MainView extends VerticalLayout {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-
     public MainView() {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         setSizeFull();
