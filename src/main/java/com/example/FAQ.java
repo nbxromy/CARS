@@ -18,6 +18,8 @@ import com.vaadin.flow.router.Route;
 @CssImport("./styles/styles.css")
 public class FAQ extends VerticalLayout {
 
+    private static final long serialVersionUID = 1L;
+
     public FAQ() {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         setSizeFull();

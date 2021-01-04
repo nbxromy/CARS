@@ -10,11 +10,8 @@ import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
-import com.vaadin.flow.component.contextmenu.MenuItem;
-import com.vaadin.flow.component.contextmenu.SubMenu;
-import com.vaadin.flow.component.datetimepicker.DateTimePicker;
+
 import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
@@ -29,6 +26,7 @@ import com.vaadin.flow.router.Route;
 @CssImport("./styles/styles.css")
 public class Rent extends VerticalLayout {
     private static final long serialVersionUID = 1L;
+    
     public LocalDateTime today = LocalDateTime.now(); 
 
     public Rent() {

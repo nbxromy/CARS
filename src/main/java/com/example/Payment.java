@@ -1,7 +1,6 @@
 package com.example;
 
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -9,10 +8,8 @@ import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -29,6 +26,10 @@ import com.vaadin.flow.router.Route;
 @Route(value="Payment")
 @CssImport("./styles/styles.css")
 public class Payment extends VerticalLayout {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
     private TextField cardNumber = new TextField("Credit card number");
     private TextField cardholderName = new TextField("Cardholder name");
     private Select<Integer> month = new Select<>();
@@ -88,6 +89,9 @@ public class Payment extends VerticalLayout {
     }
 
     private class ExpirationDateField extends CustomField<String> {
+
+        private static final long serialVersionUID = 1L;
+
         public ExpirationDateField(String label, Select<Integer> month, Select<Integer> year) {
             setLabel(label);
             HorizontalLayout layout = new HorizontalLayout(month, year);
