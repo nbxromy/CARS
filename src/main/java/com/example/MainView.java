@@ -1,5 +1,6 @@
 package com.example;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.contextmenu.MenuItem;
@@ -15,9 +16,12 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
+
+import org.vaadin.addons.searchbox.SearchBox;
 
 @Route
 @PWA(name = "Test Application", shortName = "Test App", description = "This is a test website for Qars.", enableInstallPrompt = false)
@@ -37,6 +41,9 @@ public class MainView extends VerticalLayout {
         logo.setHeight("480px");
         logo.setMaxWidth("480px");
         H3 header = new H3("To the QARS rental service!");
+
+        SearchBox searchBox = new SearchBox("Search", SearchBox.ButtonPosition.RIGHT);
+        searchBox.addSearchListener(e -> Notification.show(e.getSearchTerm()));
 
         Span dir = new Span("Please click on one of the following cars to make an order");
         Span ACInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
@@ -115,7 +122,7 @@ public class MainView extends VerticalLayout {
         FormLayout buttons4 = new FormLayout(b7);
         FormLayout Inf4 = new FormLayout(MSInf);
 
-
+        
         add(lay, lay2, dir, carimg, Inf1, buttons, carimg2, Inf2, buttons2, carimg3, Inf3, buttons3, carimg4, Inf4, buttons4);
     }
 
