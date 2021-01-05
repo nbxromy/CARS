@@ -55,13 +55,20 @@ public class MainView extends VerticalLayout {
         MenuItem menuItemReview = menuBar.addItem("Reviews");
         menuItemReview.addClickListener(e -> menuItemReview.getUI().ifPresent(ui -> ui.navigate("Reviews")));
        
+        
+       
         if(Admin.getAdmin()){
-            MenuItem menuItemReservation = menuBar.addItem("Admin");
-            menuItemReservation.addClickListener(e -> menuItemReservation.getUI().ifPresent(ui -> ui.navigate("Admin")));
+            MenuItem menuItemAdmin = menuBar.addItem("Admin");
+            menuItemAdmin.addClickListener(e -> menuItemAdmin.getUI().ifPresent(ui -> ui.navigate("Admin")));
+            SubMenu subMenuAdmin = menuItemAdmin.getSubMenu();
+            MenuItem menuItemFinishedBookings= subMenuAdmin.addItem("Finished bookings");
+            menuItemFinishedBookings.addClickListener(e -> menuItemFinishedBookings.getUI().ifPresent(ui -> ui.navigate("finishedBookings")));
+            MenuItem menuItemActiveBookings= subMenuAdmin.addItem("Active bookings");
+            menuItemActiveBookings.addClickListener(e -> menuItemActiveBookings.getUI().ifPresent(ui -> ui.navigate("activeBookings")));
         }
         
-        MenuItem menuItemReservation = menuBar.addItem("Employee");
-        menuItemReservation.addClickListener(e -> menuItemReservation.getUI().ifPresent(ui -> ui.navigate("Employee")));
+        MenuItem menuItemEmployee = menuBar.addItem("Employee");
+        menuItemEmployee.addClickListener(e -> menuItemEmployee.getUI().ifPresent(ui -> ui.navigate("Employee")));
         
          
 
@@ -77,6 +84,9 @@ public class MainView extends VerticalLayout {
         SubMenu subMenuLogin = menuItemLogin.getSubMenu();
         MenuItem menuItemRegister = subMenuLogin.addItem("Register");
         menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
+
+        
+
         add(header, menuBar);
     }
 }

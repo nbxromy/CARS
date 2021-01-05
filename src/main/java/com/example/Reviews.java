@@ -2,9 +2,11 @@ package com.example;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+
 import java.sql.ResultSet;
 import java.sql.Statement;
-
+import java.util.ArrayList;
+import java.util.List;
 
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
@@ -13,8 +15,10 @@ import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -33,9 +37,6 @@ import com.vaadin.flow.router.Route;
 @CssImport("./styles/styles.css")
 public class Reviews extends VerticalLayout {
 
-    /**
-     *
-     */ 
     private static final long serialVersionUID = 1L;
     private String[][] arrayReviews;
     static String jdbcURL = "jdbc:postgresql://localhost:5432/Test_Project";
@@ -43,18 +44,94 @@ public class Reviews extends VerticalLayout {
     static String jdbcpassword = "asd";
     public boolean loggedin= false;
 
+    public List<Reviews> reviewList = new ArrayList<>();
+    private String customerUsername;
+    private String customerReview;
+    private String customerStars;
+
     public Reviews() {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         setSizeFull();
         addClassName("reviews");
         addHeader();
+        testReviews();
         retrieveReviews();
         H2 pageName = new H2("You can write a review on the left and read reviews on the right");
         pageName.getElement().getThemeList();
         add(pageName);
         askReview();
-        viewReviews();
-        
+        //viewReviews();
+
+
+        Grid<Reviews> grid = new Grid<>(Reviews.class);
+        grid.setItems(reviewList);
+        grid.removeAllColumns();
+        grid.addColumn(Reviews::getUsername).setHeader("Customer Username");
+        //grid.addColumn(Reviews::getReview).setHeader("Reviews");
+
+        grid.addColumn(Reviews::getStars).setHeader("Stars");
+        grid.addComponentColumn(review->{
+            Label label = new Label(getReview());
+            label.getStyle().set("text-align", "right");
+            label.getStyle().set("white-space","normal");
+            return label;
+        }).setHeader("Reviews").setFlexGrow(1);
+
+        add(grid);
+    }
+    public Reviews(String usn, String review, int stars){
+        super();
+        customerUsername= usn;
+        customerReview= review;
+        if(stars==1){
+            customerStars="*";
+        }
+        else if(stars==2){
+            customerStars="**";
+        }
+        else if(stars==3){
+            customerStars="***";
+        }
+        else if(stars==4){
+            customerStars="****";
+        }
+        else if(stars==5){
+            customerStars="*****";
+        }
+    }
+    public void testReviews(){
+        for(int i=0; i<15; i++){
+            reviewList.add(new Reviews(i+" Username", "A review A review A review A review A review A review A review A review A review A review A review A review A review A review A review A review A review A review", 4));
+        }
+    }
+    // public void getReviewList(){
+    //     try{
+
+    //         Connection conn = DriverManager.getConnection(Application.jdbcURL,Application.username,Application.password);
+    //         PreparedStatement checkUsnEmail = conn.prepareStatement("SELECT * FROM \"finishedbookings\" ORDER BY customerusername ASC");
+    //         ResultSet rs = checkUsnEmail.executeQuery();
+    //         while(rs.next()){
+    //             String usn = rs.getString(1);
+    //             String license = rs.getString(2);
+    //             String amount = rs.getString(3);
+    //             String begindate= rs.getString(5);
+    //             String enddate= rs.getString(6);
+    //             reviewList.add(new Booking(usn,begindate,enddate,amount,license));
+    //         }
+    //         conn.close();
+    //     }
+    //     catch(Exception e){
+            
+    //     }
+    // }
+    public String getUsername(){
+        return customerUsername;
+    }
+    public String getReview(){
+        return customerReview;
+    }
+    public String getStars(){
+        return customerStars;
     }
  
     // Form for writing a review

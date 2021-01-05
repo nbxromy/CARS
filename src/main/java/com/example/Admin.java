@@ -38,9 +38,12 @@ public class Admin extends VerticalLayout{
     private boolean isEmp;
 
     public Admin(){
+
+        addHeader();
+        
         isAdmin = true;
         Employee.isEmployee = true;
-        addHeader();
+        
         addCar();
         formDeleteCar();
         formCreateEmployee();
@@ -183,6 +186,9 @@ public class Admin extends VerticalLayout{
         }
         return created;
     }
+
+  
+
     // Function for inserting car to database
     // Checks if licenseplate already exists
 
