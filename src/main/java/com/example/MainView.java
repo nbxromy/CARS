@@ -23,7 +23,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
 
-import org.postgresql.shaded.com.ongres.scram.common.bouncycastle.pbkdf2.Arrays;
 import org.vaadin.addons.searchbox.SearchBox;
 
 @Route
@@ -48,10 +47,12 @@ public class MainView extends VerticalLayout {
 
         String[] cars = new String[]{"opel astra"};
 
-        if(value.equals(cars[0])){
-            Notification.show("Search found!");
-        } else{
-            Notification.show("Search not found!");
+        for(String i : cars){
+            if(value.equals(i)){
+                Notification.show("Search found!");
+            } else{
+                Notification.show("Search not found!");
+            }
         }
 
         // for (int i=0; i<cars.length; i++) {
