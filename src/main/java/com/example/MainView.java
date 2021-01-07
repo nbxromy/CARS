@@ -31,10 +31,19 @@ public class MainView extends VerticalLayout {
 
     private static final long serialVersionUID = 1L;
 
+    private String searchValue;
+    private TextField test = new TextField("Enter search term");
+
     public void Search(){
-        TextField test = new TextField("Enter search term");
         test.setSizeFull();
-        add(test);
+        Button button = new Button("Search");
+        button.addClickListener(e -> searchCars());
+        add(test, button);
+    }
+
+    public void searchCars() {
+        System.out.println(test.getValue());
+
     }
 
     public MainView() {
