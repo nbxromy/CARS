@@ -23,6 +23,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
 
+import org.postgresql.shaded.com.ongres.scram.common.bouncycastle.pbkdf2.Arrays;
 import org.vaadin.addons.searchbox.SearchBox;
 
 @Route
@@ -32,29 +33,39 @@ public class MainView extends VerticalLayout {
 
     private static final long serialVersionUID = 1L;
 
-    private String searchValue;
     private TextField test = new TextField("Enter search term");
 
     public void Search(){
         test.setSizeFull();
         Button button = new Button("Search");
-        searchValue = test.getValue();
-        button.addClickListener(e -> searchCars());
+        button.addClickListener(e -> searchCars(test.getValue()));
         FormLayout searchBox = new FormLayout(test, button);
         add(searchBox);
     }
 
-    public void searchCars() {
-        String[] cars = {"Opel Astra"};
+    public void searchCars(String value) {
+        System.out.println(value);
 
-        for(String i : cars){
-            if(i == searchValue){
-                //insert function                
-            }
-            else{
-                Notification.show("Search not found!");
-            }
+        String[] cars = new String[]{"opel astra"};
+
+        if(value.equals(cars[0])){
+            Notification.show("Search found!");
+        } else{
+            Notification.show("Search not found!");
         }
+
+        // for (int i=0; i<cars.length; i++) {
+        //     if(cars[i].contains(searchValue.toLowerCase())) {
+        //         //insert function      
+        //         Notification.show("Search found!");          
+        //     } else {
+        //         Notification.show("Search not found!");
+        //     }
+        // }
+
+
+            
+        
 
     }
 
