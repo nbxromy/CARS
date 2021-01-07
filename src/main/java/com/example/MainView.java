@@ -33,6 +33,7 @@ public class MainView extends VerticalLayout {
 
     public void Search(){
         TextField test = new TextField("Enter search term");
+        test.setSizeFull();
         add(test);
     }
 
