@@ -18,6 +18,7 @@ import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
 
@@ -30,20 +31,17 @@ public class MainView extends VerticalLayout {
 
     private static final long serialVersionUID = 1L;
 
-    public class AppLayoutWithNavbarMenu extends AppLayout {
-        private static final long serialVersionUID = 1L;
-
-        public AppLayoutWithNavbarMenu() {
-        SearchBox searchBox = new SearchBox("Search", SearchBox.ButtonPosition.RIGHT);
-        searchBox.addSearchListener(e -> Notification.show(e.getSearchTerm()));
+    public void Search(){
+        TextField test = new TextField("Enter search term");
+        add(test);
     }
-}
 
     public MainView() {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         setSizeFull();
         addClassName("home");
         addHeader();
+        Search();
 
         H2 title = new H2("WELCOME!");
         Image logo = new Image("https://i.pinimg.com/564x/29/a8/b5/29a8b5bafb290cc02b1e652e694ac328.jpg", "?");
