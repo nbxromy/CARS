@@ -1,7 +1,7 @@
 package com.example;
 
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
@@ -30,6 +30,15 @@ public class MainView extends VerticalLayout {
 
     private static final long serialVersionUID = 1L;
 
+    public class AppLayoutWithNavbarMenu extends AppLayout {
+        private static final long serialVersionUID = 1L;
+
+        public AppLayoutWithNavbarMenu() {
+        SearchBox searchBox = new SearchBox("Search", SearchBox.ButtonPosition.RIGHT);
+        searchBox.addSearchListener(e -> Notification.show(e.getSearchTerm()));
+    }
+}
+
     public MainView() {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         setSizeFull();
@@ -41,9 +50,6 @@ public class MainView extends VerticalLayout {
         logo.setHeight("480px");
         logo.setMaxWidth("480px");
         H3 header = new H3("To the QARS rental service!");
-
-        SearchBox searchBox = new SearchBox("Search", SearchBox.ButtonPosition.RIGHT);
-        searchBox.addSearchListener(e -> Notification.show(e.getSearchTerm()));
 
         Span dir = new Span("Please click on one of the following cars to make an order");
         Span ACInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
