@@ -14,6 +14,7 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.listbox.ListBox;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.notification.Notification;
@@ -34,16 +35,27 @@ public class MainView extends VerticalLayout {
     private String searchValue;
     private TextField test = new TextField("Enter search term");
 
-    public void Search(){
-        test.setSizeFull();
-        Button button = new Button("Search");
-        button.addClickListener(e -> searchCars());
-        add(test, button);
-    }
+    // public void Search(){
+    //     test.setSizeFull();
+    //     Button button = new Button("Search");
+    //     button.addClickListener(e -> searchCars());
+    //     FormLayout searchBox = new FormLayout(test, button);
+    //     add(searchBox);
+    // }
 
-    public void searchCars() {
-        System.out.println(test.getValue());
+    // public void searchCars() {
+        
 
+    // }
+
+    public void test(){
+        Span search = new Span("Search for a car");
+        ListBox<String> list = new ListBox<>();
+        list.setItems("OpelAC", "OpelAS");
+        list.setValue("OpelAC");
+
+        add(search, list);
+        
     }
 
     public MainView() {
@@ -51,7 +63,7 @@ public class MainView extends VerticalLayout {
         setSizeFull();
         addClassName("home");
         addHeader();
-        Search();
+        test();
 
         H2 title = new H2("WELCOME!");
         Image logo = new Image("https://i.pinimg.com/564x/29/a8/b5/29a8b5bafb290cc02b1e652e694ac328.jpg", "?");
