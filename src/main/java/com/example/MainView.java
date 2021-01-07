@@ -43,8 +43,6 @@ public class MainView extends VerticalLayout {
     }
 
     public void searchCars(String value) {
-        System.out.println(value);
-
         String[] cars = new String[]{"opel astra"};
 
         for(String i : cars){
@@ -54,20 +52,7 @@ public class MainView extends VerticalLayout {
                 Notification.show("Search not found!");
             }
         }
-
-        // for (int i=0; i<cars.length; i++) {
-        //     if(cars[i].contains(searchValue.toLowerCase())) {
-        //         //insert function      
-        //         Notification.show("Search found!");          
-        //     } else {
-        //         Notification.show("Search not found!");
-        //     }
-        // }
-
-
             
-        
-
     }
 
     public MainView() {
@@ -134,7 +119,7 @@ public class MainView extends VerticalLayout {
         OpelZC.setHeight("480px");
         OpelZC.setMaxWidth("700px");
         Button b6 = new Button("Rent this car");
-        b6.addClickListener(e -> UI.getCurrent().navigate("Extras"));
+        b6.addClickListener(e -> UI.getCurrent().navigate("Rent"));
 
         Image OpelMS = new Image("https://media.autoweek.nl/m/m1ny1lrbl1fl_480.jpg", "?");
         OpelMS.setHeight("480px");
