@@ -1,7 +1,6 @@
 package com.example;
 
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
@@ -14,16 +13,12 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.listbox.ListBox;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
-
-import org.vaadin.addons.searchbox.SearchBox;
 
 @Route
 @PWA(name = "Test Application", shortName = "Test App", description = "This is a test website for Qars.", enableInstallPrompt = false)
@@ -37,22 +32,9 @@ public class MainView extends VerticalLayout {
     public void Search(){
         test.setSizeFull();
         Button button = new Button("Search");
-        button.addClickListener(e -> searchCars(test.getValue()));
+        button.addClickListener(e -> UI.getCurrent().navigate("Search"));
         FormLayout searchBox = new FormLayout(test, button);
         add(searchBox);
-    }
-
-    public void searchCars(String value) {
-        String[] cars = new String[]{"opel astra"};
-
-        for(String i : cars){
-            if(value.equals(i)){
-                Notification.show("Search found!");
-            } else{
-                Notification.show("Search not found!");
-            }
-        }
-            
     }
 
     public MainView() {
@@ -69,19 +51,19 @@ public class MainView extends VerticalLayout {
         H3 header = new H3("To the QARS rental service!");
 
         Span dir = new Span("Please click on one of the following cars to make an order");
-        Span ACInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
+        Span ACInf = new Span("Opel Agila Berlin; Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
         "Transmission: Manual, Airconditioning: No");
-        Span CBInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
+        Span CBInf = new Span("Opel Corsa BlitZ; Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
         "Transmission: Manual, Airconditioning: No");
-        Span MCInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
+        Span MCInf = new Span("Opel Meriva Cosmo; Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
         "Transmission: Manual, Airconditioning: Yes");
-        Span ASInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 3, Suitcases: 2, " +
+        Span ASInf = new Span("Opel Astra Sport; Fuel: Benzine, Passengers: 5, Doors: 3, Suitcases: 2, " +
         "Transmission: Manual, Airconditioning: Yes");
-        Span ICTInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 2, " +
+        Span ICTInf = new Span("Opel Insignia Country Tourer; Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 2, " +
         "Transmission: Manual, Airconditioning: Yes");
-        Span ZCInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 3, " +
+        Span ZCInf = new Span("Opel Zafira Cosmo; Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 3, " +
         "Transmission: Automatic, Airconditioning: Yes");
-        Span MSInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 3, " +
+        Span MSInf = new Span("Opel Mokka Selection; Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 3, " +
         "Transmission: Automatic, Airconditioning: Yes");
         
 
@@ -130,20 +112,20 @@ public class MainView extends VerticalLayout {
         FormLayout lay = new FormLayout(title);
         FormLayout lay2 = new FormLayout(header);
         FormLayout carimg = new FormLayout(OpelAC, OpelCB);
-        FormLayout buttons = new FormLayout(b1, b2);
         FormLayout Inf1 = new FormLayout(ACInf, CBInf);
+        FormLayout buttons = new FormLayout(b1, b2);
 
         FormLayout carimg2 = new FormLayout(OpelMC, OpelAS);
-        FormLayout buttons2 = new FormLayout(b3, b4);
         FormLayout Inf2 = new FormLayout(MCInf, ASInf);
+        FormLayout buttons2 = new FormLayout(b3, b4);
 
         FormLayout carimg3 = new FormLayout(OpelICT, OpelZC);
-        FormLayout buttons3 = new FormLayout(b5, b6);
         FormLayout Inf3 = new FormLayout(ICTInf, ZCInf);
+        FormLayout buttons3 = new FormLayout(b5, b6);
 
         FormLayout carimg4 = new FormLayout(OpelMS, logo);
-        FormLayout buttons4 = new FormLayout(b7);
         FormLayout Inf4 = new FormLayout(MSInf);
+        FormLayout buttons4 = new FormLayout(b7);
 
         
         add(lay, lay2, dir, carimg, Inf1, buttons, carimg2, Inf2, buttons2, carimg3, Inf3, buttons3, carimg4, Inf4, buttons4);
