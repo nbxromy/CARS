@@ -104,6 +104,7 @@ public class Register extends VerticalLayout {
             registerButton.addClickListener(event -> checkCredentials(errorMessage, firstnameField.getValue(), lastnameField.getValue(), bsnField.getValue(), documentnumberField.getValue(), addressField.getValue(), birthdateField.getValue(), zipField.getValue(), cityField.getValue(), countrycodeField.getValue(), emailField.getValue(), phonenumberField.getValue(), usernameField.getValue(), passwordField1.getValue(), passwordField2.getValue()));
         } else {
             UI.getCurrent().navigate("");
+            UI.getCurrent().getPage().reload();
         }
     }
     // Check given credentials

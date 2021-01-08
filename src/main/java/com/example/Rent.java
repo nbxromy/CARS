@@ -124,6 +124,7 @@ public class Rent extends VerticalLayout {
             add(title, carField, licencePlateField, pickupLocationField, pickupDatePicker, pickupTimePicker, dropoffDatePicker, dropoffTimePicker, checkboxExtras, calculateButton, priceMessage, errorMessage, confirmButton, confirmButton2, cancelButton);
         } else {
             UI.getCurrent().navigate("Login");
+            UI.getCurrent().getPage().reload();
         }
     }
 

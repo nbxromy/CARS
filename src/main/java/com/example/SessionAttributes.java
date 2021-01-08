@@ -81,23 +81,4 @@ public class SessionAttributes {
             return VaadinService.getCurrentRequest().getWrappedSession().getAttribute("location").toString();
         }
     }
-
-    // Function to select order ID
-    public static void selectReservation(int orderID) {
-        VaadinService.getCurrentRequest().getWrappedSession().setAttribute("selectedOrder", orderID);
-    }
-
-    // Function to deselect order ID
-    public static void deselectOrder() {
-        VaadinService.getCurrentRequest().getWrappedSession().setAttribute("selectedOrder", null);
-    }
-
-    // Return orderID
-    public static String getSelectedOrder() {
-        if (VaadinService.getCurrentRequest().getWrappedSession().getAttribute("selectedOrder") == null) {
-            return null;
-        } else {
-            return VaadinService.getCurrentRequest().getWrappedSession().getAttribute("selectedOrder").toString();
-        }
-    }
 }

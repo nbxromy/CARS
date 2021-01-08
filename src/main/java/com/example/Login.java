@@ -71,6 +71,7 @@ public class Login extends VerticalLayout {
             loginButton.addClickListener(event -> authenticate(errorMessage, usernameField, passwordField));
         } else {
             UI.getCurrent().navigate("");
+            UI.getCurrent().getPage().reload();
         }
     }
 

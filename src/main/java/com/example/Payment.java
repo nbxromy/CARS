@@ -28,9 +28,7 @@ import com.vaadin.flow.router.Route;
 @PageTitle("Reservation Payment")
 @CssImport("./styles/styles.css")
 public class Payment extends VerticalLayout {
-    /**
-     *
-     */
+
     private static final long serialVersionUID = 1L;
     private TextField cardNumber = new TextField("Credit card number");
     private TextField cardholderName = new TextField("Cardholder name");
@@ -41,17 +39,22 @@ public class Payment extends VerticalLayout {
     private Button submit = new Button("Submit");
 
     public Payment() {
-        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
-        setSizeFull();
-        addHeader();
-        add(createTitle());
-        add(createFormLayout());
-        add(createButtonLayout());
+        if (SessionAttributes.getLoggedIn() != null || SessionAttributes.getLoggedIn() == "true") {
+            setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+            setSizeFull();
+            addHeader();
+            add(createTitle());
+            add(createFormLayout());
+            add(createButtonLayout());
 
-        submit.addClickListener(e -> {
-            Notification.show("Thanks for paying!");
-            UI.getCurrent().navigate("ProfileReservations");
-        });
+            submit.addClickListener(e -> {
+                Notification.show("Thanks for paying!");
+                UI.getCurrent().navigate("ProfileReservations");
+            });
+        } else {
+            UI.getCurrent().navigate("Login");
+            UI.getCurrent().getPage().reload();
+        }
     }
 
     private Component createTitle() {

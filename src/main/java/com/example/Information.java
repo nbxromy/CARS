@@ -15,9 +15,11 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @Route(value="Information")
+@PageTitle("Information")
 @CssImport("./styles/styles.css")
 public class Information extends VerticalLayout {
     private static final long serialVersionUID = 1L;

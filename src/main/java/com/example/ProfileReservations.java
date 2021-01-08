@@ -10,7 +10,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import com.vaadin.data.SelectionModel;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -29,8 +31,11 @@ import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.ui.components.grid.SingleSelectionModel;
+import com.vaadin.ui.renderers.ButtonRenderer;
 
 
 @Route(value="ProfileReservations")
@@ -42,7 +47,7 @@ public class ProfileReservations extends VerticalLayout {
     private String jdbcUsername = "postgres";
     private String jdbcPassword = "asdf";
 
-    private LocalDate today = LocalDate.now();
+    private LocalDateTime today = LocalDateTime.now();
 
     // Profile of the logged in user 
     public ProfileReservations() {
@@ -75,6 +80,7 @@ public class ProfileReservations extends VerticalLayout {
             }
         } else {
             UI.getCurrent().navigate("Login");
+            UI.getCurrent().getPage().reload();
         }
     }
 
@@ -100,7 +106,6 @@ public class ProfileReservations extends VerticalLayout {
     // Get reservations from database
     private void getReservations() {
         List<Reservation> reservationList = new ArrayList<>(); 
-
         // Show all reservations of logged in user
         try {
             Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
@@ -116,29 +121,97 @@ public class ProfileReservations extends VerticalLayout {
             e.printStackTrace();
         }  
 
-        // ** Layout here
+        // Reservation layout
         Grid<Reservation> reservationGrid = new Grid<>(Reservation.class);
         reservationGrid.setItems(reservationList);
-        reservationGrid.removeColumnByKey("orderID");
-        reservationGrid.setColumns("carName", "price", "isPaid", "location", "pickupDate", "pickupTime", "dropoffDate", "dropoffTime");
+        reservationGrid.setMultiSort(false);
+        reservationGrid.setColumns("orderID", "carName", "licencePlate", "price", "isPaid", "location", "pickupDate", "pickupTime", "dropoffDate", "dropoffTime");
+
         reservationGrid.setSelectionMode(SelectionMode.SINGLE);
-        add(reservationGrid);
+        add(reservationGrid);   
 
+        Span errorMessage = new Span();
+        errorMessage.getStyle().set("color", "var(--lumo-error-text-color)");
+        errorMessage.getStyle().set("padding", "15px 0");
+
+        TextField orderIdField = new TextField("Enter your order ID which you want to delete");
+        orderIdField.getStyle().set("width", "500px");
         Button cancelButton = new Button("Cancel reservation");
-        //cancelButton.cancelVerification();
-        reservationGrid.addSelectionListener(e -> add(cancelButton));;
-    
+
+        // Cancel reservation checks
+        cancelButton.addClickListener(e -> {
+            boolean checkExists = checkReservation(orderIdField.getValue());
+            if (!checkExists) {
+                errorMessage.setText("No reservation found");
+            } else {
+                boolean checkDate = verificateReservation(orderIdField.getValue());
+                if (!checkDate) {
+                    errorMessage.setText("You can't cancel a reservation in 48 hours before pickup, please contact your local Qars location");
+                } else {
+                    cancelReservation(orderIdField.getValue());
+                }
+            }
+        });
+        add(errorMessage, orderIdField, cancelButton);
     }
 
-    private void cancelVerification(String orderID, LocalDate pickupDate) {
-        if (today.isBefore(pickupDate.minusDays(2))) {
-            cancelReservation(orderID);
-        }
+    // Check if given value exists in database
+    private boolean checkReservation(String orderID) {
+        try {
+            Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
+            String sql = "SELECT * FROM reservations WHERE username='"+SessionAttributes.getLoggedUser()+"' AND orderid='"+orderID+"'";
+            Statement statement = connection.createStatement();
+            ResultSet resultset = statement.executeQuery(sql);
+            if (resultset.next()) {
+                return true;
+            } 
+            connection.close();
+            return false;
+        } catch(SQLException e) {
+            System.out.println("Error in connecting postgres");
+            e.printStackTrace();
+            return false;
+        }  
     }
 
+    // Check if pickup time is not in 48 hours
+    private boolean verificateReservation(String orderID) {
+        try {
+            Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
+            String sql = "SELECT * FROM reservations WHERE username='"+SessionAttributes.getLoggedUser()+"' AND orderid='"+orderID+"'";
+            Statement statement = connection.createStatement();
+            ResultSet resultset = statement.executeQuery(sql);
+            if (resultset.next()) {
+                LocalDateTime pickupDateTime = LocalDateTime.of(LocalDate.parse(resultset.getString("pickupdate")), LocalTime.parse(resultset.getString("pickuptime")));
+                if (pickupDateTime.isBefore(today.plusHours(48))) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } 
+            connection.close();
+            return false;
+        } catch(SQLException e) {
+            System.out.println("Error in connecting postgres");
+            e.printStackTrace();
+            return false;
+        } 
+    }
+
+    // Cancel reservation and delete from database
     private void cancelReservation(String orderID) {
-        System.out.println("Success!");
-        // Database code here
+        try {
+            Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
+            String sql = "DELETE FROM reservations WHERE username='"+SessionAttributes.getLoggedUser()+"' AND orderid='"+orderID+"'";
+            Statement statement = connection.createStatement();
+            statement.executeUpdate(sql);
+            connection.close();
+        } catch(SQLException e) {
+            System.out.println("Error in connecting postgres");
+            e.printStackTrace();
+        }  
+
+        UI.getCurrent().getPage().reload();
     }
 
     // HEADER

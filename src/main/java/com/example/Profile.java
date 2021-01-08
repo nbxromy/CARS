@@ -166,6 +166,7 @@ public class Profile extends VerticalLayout {
             add(personalSectionName, information, buttonLayout, errorMessage, successMessage);
         } else {
             UI.getCurrent().navigate("Login");
+            UI.getCurrent().getPage().reload();
         }
     }
 
