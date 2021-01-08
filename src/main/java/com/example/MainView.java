@@ -1,5 +1,7 @@
 package com.example;
 
+import com.example.Search;
+
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.contextmenu.MenuItem;
@@ -15,6 +17,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
@@ -29,10 +32,68 @@ public class MainView extends VerticalLayout {
 
     private TextField test = new TextField("Enter search term");
 
+
     public void Search(){
         test.setSizeFull();
         Button button = new Button("Search");
-        button.addClickListener(e -> UI.getCurrent().navigate("Search"));
+        button.addClickListener(e -> { 
+            switch(test.getValue().toUpperCase()){
+                case "AUTOMATIC":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                case "MANUAL":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                case "AIRCONDITIONING":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                case "NO AIRCONDITIONING":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                case "OPEL AGILA":
+                case "AGILA":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                case "OPEL CORSA":
+                case "CORSA":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                case "OPEL MERIVA":
+                case "MERIVA":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                case "OPEL ASTRA":
+                case "ASTRA":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                case "OPEL INSIGNIA":
+                case "INSIGNIA":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                case "OPEL ZAFIRA":
+                case "ZAFIRA":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                case "OPEL MOKKA":
+                case "MOKKA":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                default:
+                    Notification.show("Search not found!");
+                break;
+            }
+        });
         FormLayout searchBox = new FormLayout(test, button);
         add(searchBox);
     }

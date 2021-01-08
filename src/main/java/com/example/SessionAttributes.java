@@ -34,4 +34,17 @@ public class SessionAttributes {
         }
     }
 
+    // Function to store search value
+    public static void setSearchValue(String value) {
+        VaadinService.getCurrentRequest().getWrappedSession().setAttribute("searchValue", value);
+    }
+
+    // Return search value
+    public static String getSearchValue() {
+        if (VaadinService.getCurrentRequest().getWrappedSession().getAttribute("searchValue") == null) {
+            return null;
+        } else {
+            return VaadinService.getCurrentRequest().getWrappedSession().getAttribute("searchValue").toString();
+        }
+    }
 }
