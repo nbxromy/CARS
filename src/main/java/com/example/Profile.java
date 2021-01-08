@@ -18,6 +18,7 @@ import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -26,9 +27,11 @@ import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @Route(value="Profile")
+@PageTitle("User profile")
 @CssImport("./styles/styles.css")
 public class Profile extends VerticalLayout {
 
@@ -58,6 +61,11 @@ public class Profile extends VerticalLayout {
     private TextField bsnField = new TextField("BSN");
     private TextField documentnumberField = new TextField("Document number");
 
+    private Icon personalIcon = new Icon(VaadinIcon.USER_STAR); 
+    private Icon addressIcon = new Icon(VaadinIcon.HOME);
+    private Icon contactIcon = new Icon(VaadinIcon.PHONE);
+    private Icon licenceIcon = new Icon(VaadinIcon.USER_CARD);
+
     private Span errorMessage = new Span();
     private Span successMessage = new Span();
 
@@ -73,7 +81,7 @@ public class Profile extends VerticalLayout {
 
             // Front-end for showing personal details about logged in user
             Accordion information = new Accordion();
-
+        
             // Set input fields as required
             firstnameField.setRequired(true);
             lastnameField.setRequired(true);
@@ -87,6 +95,19 @@ public class Profile extends VerticalLayout {
             bsnField.setRequired(true);
             documentnumberField.setRequired(true);
 
+            // Icons
+            personalIcon.setSize("35px");
+            personalIcon.setColor("lightblue");
+            addressIcon.setSize("35px");
+            addressIcon.setColor("lightblue");
+            contactIcon.setSize("35px");
+            contactIcon.setColor("lightblue");
+            licenceIcon.setSize("35px");
+            licenceIcon.setColor("lightblue");
+
+            // Personal information section title
+            H3 personalSectionName = new H3("Personal Information");
+            
             // Layout personal information
             HorizontalLayout personalLayout = new HorizontalLayout();
             Icon personalIcon = new Icon(VaadinIcon.USER_STAR);
@@ -118,7 +139,7 @@ public class Profile extends VerticalLayout {
             licenceIcon.setColor("lightblue");
             licenceLayout.add(licenceIcon, bsnField, documentnumberField);
             information.add("Drivers Licence", licenceLayout).addThemeVariants(DetailsVariant.FILLED);
-
+    
             fillPersonalDetails(SessionAttributes.getLoggedUser());
             
             // Buttons to update or reset personal details with database
@@ -141,7 +162,8 @@ public class Profile extends VerticalLayout {
             successMessage.getStyle().set("color", "var(--lumo-success-text-color)");
             successMessage.getStyle().set("padding", "15px 0");
 
-            add(information, buttonLayout, errorMessage, successMessage);
+            //add(personalSectionName, information, buttonLayout, errorMessage, successMessage);
+            add(personalSectionName, information, buttonLayout, errorMessage, successMessage);
         } else {
             UI.getCurrent().navigate("Login");
         }
@@ -287,6 +309,8 @@ public class Profile extends VerticalLayout {
             MenuItem menuItemRegister = subMenuLogin.addItem("Register");
             menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
         } else {
+            MenuItem menuItemReservations = subMenuLogin.addItem("Reservations");
+            menuItemReservations.addClickListener(e -> menuItemReservations.getUI().ifPresent(ui -> ui.navigate("ProfileReservations")));
             MenuItem menuItemRegister = subMenuLogin.addItem("Logout");
             menuItemRegister.addClickListener(e -> SessionAttributes.logout());
             menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Login")));

@@ -21,9 +21,11 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @Route(value="Payment")
+@PageTitle("Reservation Payment")
 @CssImport("./styles/styles.css")
 public class Payment extends VerticalLayout {
     /**
@@ -35,11 +37,8 @@ public class Payment extends VerticalLayout {
     private Select<Integer> month = new Select<>();
     private Select<Integer> year = new Select<>();
     private ExpirationDateField expiration = new ExpirationDateField("Expiration date", month, year);
-    private PasswordField csc = new PasswordField("CSC");
-
-    private Button cancel = new Button("Cancel");
+    private PasswordField csc = new PasswordField("CSC");;
     private Button submit = new Button("Submit");
-    private Button payOnLocation = new Button ("Pay on location");
 
     public Payment() {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
@@ -49,14 +48,9 @@ public class Payment extends VerticalLayout {
         add(createFormLayout());
         add(createButtonLayout());
 
-        cancel.addClickListener(e -> {
-            UI.getCurrent().navigate("");
-        });
         submit.addClickListener(e -> {
             Notification.show("Thanks for paying!");
-        });
-        payOnLocation.addClickListener(e -> {
-            Notification.show("Payment pending...");
+            UI.getCurrent().navigate("ProfileReservations");
         });
     }
 
@@ -83,8 +77,7 @@ public class Payment extends VerticalLayout {
         year.setPlaceholder("Year");
         year.setItems(21, 22, 23, 24, 25);
         submit.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        payOnLocation.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
-        buttonLayout.add(submit, payOnLocation, cancel);
+        buttonLayout.add(submit);
         return buttonLayout;
     }
 
@@ -158,6 +151,8 @@ public class Payment extends VerticalLayout {
             MenuItem menuItemRegister = subMenuLogin.addItem("Register");
             menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
         } else {
+            MenuItem menuItemReservations = subMenuLogin.addItem("Reservations");
+            menuItemReservations.addClickListener(e -> menuItemReservations.getUI().ifPresent(ui -> ui.navigate("ProfileReservations")));
             MenuItem menuItemRegister = subMenuLogin.addItem("Logout");
             menuItemRegister.addClickListener(e -> SessionAttributes.logout());
             menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Login")));

@@ -47,4 +47,57 @@ public class SessionAttributes {
             return VaadinService.getCurrentRequest().getWrappedSession().getAttribute("searchValue").toString();
         }
     }
+    
+    // Function to select a car to rent
+    public static void selectCar(String car, String licencePlate, String location) {
+        VaadinService.getCurrentRequest().getWrappedSession().setAttribute("selectedCar", car);
+        VaadinService.getCurrentRequest().getWrappedSession().setAttribute("selectedLicencePlate", licencePlate);
+        VaadinService.getCurrentRequest().getWrappedSession().setAttribute("location", location);
+    }
+
+    // Return car to rent
+    public static String getSelectedCar() {
+        if (VaadinService.getCurrentRequest().getWrappedSession().getAttribute("selectedCar") == null) {
+            return null;
+        } else {
+            return VaadinService.getCurrentRequest().getWrappedSession().getAttribute("selectedCar").toString();
+        }
+    }
+
+    // Return licence plate of car to rent 
+    public static String getSelectedLicencePlate() {
+        if (VaadinService.getCurrentRequest().getWrappedSession().getAttribute("selectedLicencePlate") == null) {
+            return null;
+        } else {
+            return VaadinService.getCurrentRequest().getWrappedSession().getAttribute("selectedLicencePlate").toString();
+        }
+    }
+
+    //Return pickup location of car to rent
+    public static String getSelectedLocation() {
+        if (VaadinService.getCurrentRequest().getWrappedSession().getAttribute("location") == null) {
+            return null;
+        } else {
+            return VaadinService.getCurrentRequest().getWrappedSession().getAttribute("location").toString();
+        }
+    }
+
+    // Function to select order ID
+    public static void selectReservation(int orderID) {
+        VaadinService.getCurrentRequest().getWrappedSession().setAttribute("selectedOrder", orderID);
+    }
+
+    // Function to deselect order ID
+    public static void deselectOrder() {
+        VaadinService.getCurrentRequest().getWrappedSession().setAttribute("selectedOrder", null);
+    }
+
+    // Return orderID
+    public static String getSelectedOrder() {
+        if (VaadinService.getCurrentRequest().getWrappedSession().getAttribute("selectedOrder") == null) {
+            return null;
+        } else {
+            return VaadinService.getCurrentRequest().getWrappedSession().getAttribute("selectedOrder").toString();
+        }
+    }
 }

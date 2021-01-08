@@ -20,10 +20,12 @@ import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
 
 @Route
+@PageTitle("Homepage")
 @PWA(name = "Test Application", shortName = "Test App", description = "This is a test website for Qars.", enableInstallPrompt = false)
 @CssImport("./styles/styles.css")
 public class MainView extends VerticalLayout {
@@ -132,43 +134,43 @@ public class MainView extends VerticalLayout {
         OpelAC.setHeight("480px");
         OpelAC.setMaxWidth("700px");
         Button b1 = new Button("Rent this car");
-        b1.addClickListener(e -> UI.getCurrent().navigate("Rent"));
+        b1.addClickListener(e -> rentCar("Opel Agila", "232-ABD-435", "Rotterdam"));
 
         Image OpelCB = new Image("https://www.autozine.nl/cache/nieuws/336/13032_1.jpg", "?");
         OpelCB.setHeight("480px");
         OpelCB.setMaxWidth("700px");
         Button b2 = new Button("Rent this car");
-        b2.addClickListener(e -> UI.getCurrent().navigate("Rent"));
+        b2.addClickListener(e -> rentCar("Opel Corsa", "ASD-468-JSJ", "Rotterdam"));
 
         Image OpelMC = new Image("https://cdn.autowereld.nl/I477815795/640x0/opel-meriva-1-4-turbo-ecotec-120pk-aut-cosmo-ecc-pdc-lmv.jpg", "?");
         OpelMC.setHeight("480px");
         OpelMC.setMaxWidth("700px");
         Button b3 = new Button("Rent this car");
-        b3.addClickListener(e -> UI.getCurrent().navigate("Rent"));
+        b3.addClickListener(e -> rentCar("Opel Meriva", "JDD-DEW-323", "Rotterdam"));
 
         Image OpelAS = new Image("https://dealerimages.dealereprocess.com/image/upload/2090049.jpg", "?");
         OpelAS.setHeight("480px");
         OpelAS.setMaxWidth("700px");
         Button b4 = new Button("Rent this car");
-        b4.addClickListener(e -> UI.getCurrent().navigate("Rent"));
+        b4.addClickListener(e -> rentCar("Opel Astra", "111-AAA-222","Rotterdam"));
 
         Image OpelICT = new Image("https://www.passion4wheels.nl/wp-content/uploads/2013/07/Opel-Insignia-Country-Tourer-286820.jpg", "?");
         OpelICT.setHeight("480px");
         OpelICT.setMaxWidth("700px");
         Button b5 = new Button("Rent this car");
-        b5.addClickListener(e -> UI.getCurrent().navigate("Rent"));
+        b5.addClickListener(e -> rentCar("Opel Insignia Country Tourer","FWE-433-3DW","Rotterdam"));
 
         Image OpelZC = new Image("https://i.ebayimg.com/00/s/NzY4WDEwMjQ=/z/ILAAAOSw~kFflBTq/$_85.JPG", "?");
         OpelZC.setHeight("480px");
         OpelZC.setMaxWidth("700px");
         Button b6 = new Button("Rent this car");
-        b6.addClickListener(e -> UI.getCurrent().navigate("Rent"));
-
+        b6.addClickListener(e -> rentCar("Opel Zafira", "MEK-AE2-224","Rotterdam"));
+        
         Image OpelMS = new Image("https://media.autoweek.nl/m/m1ny1lrbl1fl_480.jpg", "?");
         OpelMS.setHeight("480px");
         OpelMS.setMaxWidth("700px");
         Button b7 = new Button("Rent this car");
-        b7.addClickListener(e -> UI.getCurrent().navigate("Rent"));
+        b7.addClickListener(e -> rentCar("Opel Mokka SUV", "434-223-EEE","Rotterdam"));
 
         FormLayout lay = new FormLayout(title);
         FormLayout lay2 = new FormLayout(header);
@@ -190,6 +192,11 @@ public class MainView extends VerticalLayout {
 
         
         add(lay, lay2, dir, carimg, Inf1, buttons, carimg2, Inf2, buttons2, carimg3, Inf3, buttons3, carimg4, Inf4, buttons4);
+    }
+
+    private void rentCar(String car, String licencePlate, String location) {
+        SessionAttributes.selectCar(car, licencePlate, location);
+        UI.getCurrent().navigate("Rent");
     }
 
     // HEADER
@@ -237,6 +244,8 @@ public class MainView extends VerticalLayout {
             MenuItem menuItemRegister = subMenuLogin.addItem("Register");
             menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
         } else {
+            MenuItem menuItemReservations = subMenuLogin.addItem("Reservations");
+            menuItemReservations.addClickListener(e -> menuItemReservations.getUI().ifPresent(ui -> ui.navigate("ProfileReservations")));
             MenuItem menuItemRegister = subMenuLogin.addItem("Logout");
             menuItemRegister.addClickListener(e -> SessionAttributes.logout());
             menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Login")));

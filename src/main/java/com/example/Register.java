@@ -25,9 +25,11 @@ import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @Route(value="Register")
+@PageTitle("Register")
 @CssImport("./styles/styles.css")
 public class Register extends VerticalLayout {
     private static final long serialVersionUID = 1L;

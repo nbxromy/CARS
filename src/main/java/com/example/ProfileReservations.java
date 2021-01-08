@@ -5,6 +5,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -12,136 +17,129 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.PasswordField;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-@Route(value="Login")
-@PageTitle("Login")
-@CssImport("./styles/styles.css")
-public class Login extends VerticalLayout {
 
-    private static final long serialVersionUID = 1L;
+@Route(value="ProfileReservations")
+@PageTitle("User reservations")
+@CssImport("./styles/styles.css")
+public class ProfileReservations extends VerticalLayout {
     // Database credentials
     private String jdbcURL = "jdbc:postgresql://localhost:5432/ProjectC";
     private String jdbcUsername = "postgres";
     private String jdbcPassword = "asdf";
 
-    public Login() {
-        if (SessionAttributes.getLoggedIn() == null || SessionAttributes.getLoggedIn() == "false") {
+    private LocalDate today = LocalDate.now();
+
+    // Profile of the logged in user 
+    public ProfileReservations() {
+        if (SessionAttributes.getLoggedIn() != null && SessionAttributes.getLoggedIn() == "true") {
             setDefaultHorizontalComponentAlignment(Alignment.CENTER);
             setSizeFull();
-            addClassName("login");
+            addClassName("profile");
             addHeader();
+            H2 pageName = new H2("Welcome " + SessionAttributes.getLoggedUser() + "!");
+            add(pageName);
 
-            // Front-end login form 
-            H2 pageName = new H2("Log in");
-            pageName.getElement().getThemeList();
+            // Reservation Section
+            boolean hasAnyReservations = checkReservations();
+            H3 reservationSectionName = new H3("Your reservations");
+            add(reservationSectionName);
 
-            TextField usernameField = new TextField("User name");
-            usernameField.setRequired(true);
-            PasswordField passwordField = new PasswordField("Password");
-            passwordField.setRequired(true);
-            Span errorMessage = new Span();
+            if (!hasAnyReservations) {
+                Span message = new Span();
+                message.getStyle().set("color", "var(--lumo-primary-text-color)");
+                message.getStyle().set("padding", "15px 0");
+                message.setText("No reservations found!");
 
-            Button loginButton = new Button("Log in");
-            loginButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                Button redirectButton = new Button("Click here to make a reservation");
+                redirectButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                redirectButton.addClickListener(event -> UI.getCurrent().navigate(""));
 
-            FormLayout layout = new FormLayout(pageName, usernameField, passwordField, errorMessage, loginButton);
-            layout.setMaxWidth("300px");
-            layout.getStyle().set("margin", "0 auto");
-            layout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP), new FormLayout.ResponsiveStep("490px", 2, FormLayout.ResponsiveStep.LabelsPosition.TOP));
-            layout.setColspan(pageName, 2);
-            layout.setColspan(errorMessage, 2);
-            layout.setColspan(loginButton, 2);
-
-            errorMessage.getStyle().set("color", "var(--lumo-error-text-color)");
-            errorMessage.getStyle().set("padding", "15px 0");
-            add(layout);
-            loginButton.addClickListener(event -> authenticate(errorMessage, usernameField, passwordField));
-        } else {
-            UI.getCurrent().navigate("");
-        }
-    }
-
-    // Check given credentials
-    private void authenticate(Span error, TextField usernameField, PasswordField passwordField) {
-        boolean correctUsername = false;
-        boolean correctPassword = false;
-
-        String username = usernameField.getValue();
-        String password = passwordField.getValue();
-
-        if (usernameField.isEmpty() || passwordField.isEmpty()) {
-            error.setText("Fill in all fields!");
-        } else {
-            correctUsername = checkUsername(username);
-            if (!correctUsername) {
-                error.setText("Username does not exist");
+                add(message, redirectButton);
             } else {
-                correctPassword = checkPassword(username, password);
-                if (!correctPassword) {
-                    error.setText("Password is not correct");
-                } else {
-                    SessionAttributes.login(username);
-                    UI.getCurrent().navigate("Profile");
-                }
+                getReservations();
             }
+        } else {
+            UI.getCurrent().navigate("Login");
         }
     }
 
-    // Connect to database and check is username exists
-    private boolean checkUsername(String username) {
-        boolean usernameExists = false;
+    // Check if user has any reservations
+    private boolean checkReservations() {
         try {
             Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
-            String sql = "SELECT * FROM customers WHERE username='"+username+"'";
+            String sql = "SELECT * FROM reservations WHERE username='"+SessionAttributes.getLoggedUser()+"'";
             Statement statement = connection.createStatement();
             ResultSet resultset = statement.executeQuery(sql);
             if (resultset.next()) {
-                usernameExists = true;
-            } else {
-                usernameExists = false;
-            }
+                return true;
+            } 
+            connection.close();
+            return false;
+        } catch(SQLException e) {
+            System.out.println("Error in connecting postgres");
+            e.printStackTrace();
+            return false;
+        }  
+    } 
+
+    // Get reservations from database
+    private void getReservations() {
+        List<Reservation> reservationList = new ArrayList<>(); 
+
+        // Show all reservations of logged in user
+        try {
+            Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
+            String sql = "SELECT * FROM reservations WHERE username='"+SessionAttributes.getLoggedUser()+"'";
+            Statement statement = connection.createStatement();
+            ResultSet resultset = statement.executeQuery(sql);
+            while (resultset.next()) {
+                reservationList.add(new Reservation(resultset.getString("orderid"), resultset.getString("carname"), resultset.getString("licenceplate"), resultset.getString("username"), resultset.getString("location"), LocalDate.parse(resultset.getString("pickupdate")), LocalTime.parse(resultset.getString("pickuptime")), LocalDate.parse(resultset.getString("dropoffdate")), LocalTime.parse(resultset.getString("dropofftime")), "€"+resultset.getString("price")+",00", resultset.getString("ispaid"), resultset.getString("gps"), resultset.getString("insurance"), resultset.getString("wintertires"), resultset.getString("extradriver"), resultset.getString("childseat")));
+            } 
             connection.close();
         } catch(SQLException e) {
             System.out.println("Error in connecting postgres");
             e.printStackTrace();
-        }
-        return usernameExists;
+        }  
+
+        // ** Layout here
+        Grid<Reservation> reservationGrid = new Grid<>(Reservation.class);
+        reservationGrid.setItems(reservationList);
+        reservationGrid.removeColumnByKey("orderID");
+        reservationGrid.setColumns("carName", "price", "isPaid", "location", "pickupDate", "pickupTime", "dropoffDate", "dropoffTime");
+        reservationGrid.setSelectionMode(SelectionMode.SINGLE);
+        add(reservationGrid);
+
+        Button cancelButton = new Button("Cancel reservation");
+        //cancelButton.cancelVerification();
+        reservationGrid.addSelectionListener(e -> add(cancelButton));;
+    
     }
 
-    // Connect to database and check if combination of the given username and password is correct
-    private boolean checkPassword(String username, String password) {
-        boolean correctPassword = false;
-        try {
-            Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
-            String sql = "SELECT * FROM customers WHERE username='"+username+"' AND password='"+password+"'";
-            Statement statement = connection.createStatement();
-            ResultSet resultset = statement.executeQuery(sql);
-            if (resultset.next()) {
-                correctPassword = true;
-            } else {
-                correctPassword = false;
-            }
-            connection.close();
-        } catch(SQLException e) {
-            System.out.println("Error in connecting postgres");
-            e.printStackTrace();
+    private void cancelVerification(String orderID, LocalDate pickupDate) {
+        if (today.isBefore(pickupDate.minusDays(2))) {
+            cancelReservation(orderID);
         }
-        return correctPassword;
     }
 
+    private void cancelReservation(String orderID) {
+        System.out.println("Success!");
+        // Database code here
+    }
 
     // HEADER
     public void addHeader() {
@@ -188,6 +186,8 @@ public class Login extends VerticalLayout {
             MenuItem menuItemRegister = subMenuLogin.addItem("Register");
             menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
         } else {
+            MenuItem menuItemReservations = subMenuLogin.addItem("Reservations");
+            menuItemReservations.addClickListener(e -> menuItemReservations.getUI().ifPresent(ui -> ui.navigate("ProfileReservations")));
             MenuItem menuItemRegister = subMenuLogin.addItem("Logout");
             menuItemRegister.addClickListener(e -> SessionAttributes.logout());
             menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Login")));
@@ -195,4 +195,3 @@ public class Login extends VerticalLayout {
         add(header, menuBar);
     }
 }
-

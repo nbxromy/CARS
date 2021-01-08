@@ -12,9 +12,11 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @Route(value="FAQ")
+@PageTitle("Frequently Asked Questions")
 @CssImport("./styles/styles.css")
 public class FAQ extends VerticalLayout {
 
