@@ -1,5 +1,7 @@
 package com.example;
 
+import com.example.Search;
+
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.contextmenu.MenuItem;
@@ -15,7 +17,9 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
 
@@ -26,11 +30,80 @@ public class MainView extends VerticalLayout {
 
     private static final long serialVersionUID = 1L;
 
+    private TextField test = new TextField("Enter search term");
+
+
+    public void Search(){
+        test.setSizeFull();
+        Button button = new Button("Search");
+        button.addClickListener(e -> { 
+            switch(test.getValue().toUpperCase()){
+                case "AUTOMATIC":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                case "MANUAL":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                case "AIRCONDITIONING":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                case "NO AIRCONDITIONING":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                case "OPEL AGILA":
+                case "AGILA":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                case "OPEL CORSA":
+                case "CORSA":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                case "OPEL MERIVA":
+                case "MERIVA":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                case "OPEL ASTRA":
+                case "ASTRA":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                case "OPEL INSIGNIA":
+                case "INSIGNIA":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                case "OPEL ZAFIRA":
+                case "ZAFIRA":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                case "OPEL MOKKA":
+                case "MOKKA":
+                SessionAttributes.setSearchValue(test.getValue());
+                UI.getCurrent().navigate("Search");
+                break;
+                default:
+                    Notification.show("Search not found!");
+                break;
+            }
+        });
+        FormLayout searchBox = new FormLayout(test, button);
+        add(searchBox);
+    }
+
     public MainView() {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         setSizeFull();
         addClassName("home");
         addHeader();
+        Search();
 
         H2 title = new H2("WELCOME!");
         Image logo = new Image("https://i.pinimg.com/564x/29/a8/b5/29a8b5bafb290cc02b1e652e694ac328.jpg", "?");
@@ -39,19 +112,19 @@ public class MainView extends VerticalLayout {
         H3 header = new H3("To the QARS rental service!");
 
         Span dir = new Span("Please click on one of the following cars to make an order");
-        Span ACInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
+        Span ACInf = new Span("Opel Agila Berlin; Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
         "Transmission: Manual, Airconditioning: No");
-        Span CBInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
+        Span CBInf = new Span("Opel Corsa BlitZ; Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
         "Transmission: Manual, Airconditioning: No");
-        Span MCInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
+        Span MCInf = new Span("Opel Meriva Cosmo; Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
         "Transmission: Manual, Airconditioning: Yes");
-        Span ASInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 3, Suitcases: 2, " +
+        Span ASInf = new Span("Opel Astra Sport; Fuel: Benzine, Passengers: 5, Doors: 3, Suitcases: 2, " +
         "Transmission: Manual, Airconditioning: Yes");
-        Span ICTInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 2, " +
+        Span ICTInf = new Span("Opel Insignia Country Tourer; Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 2, " +
         "Transmission: Manual, Airconditioning: Yes");
-        Span ZCInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 3, " +
+        Span ZCInf = new Span("Opel Zafira Cosmo; Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 3, " +
         "Transmission: Automatic, Airconditioning: Yes");
-        Span MSInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 3, " +
+        Span MSInf = new Span("Opel Mokka Selection; Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 3, " +
         "Transmission: Automatic, Airconditioning: Yes");
         
 
@@ -89,7 +162,7 @@ public class MainView extends VerticalLayout {
         OpelZC.setHeight("480px");
         OpelZC.setMaxWidth("700px");
         Button b6 = new Button("Rent this car");
-        b6.addClickListener(e -> UI.getCurrent().navigate("Extras"));
+        b6.addClickListener(e -> UI.getCurrent().navigate("Rent"));
 
         Image OpelMS = new Image("https://media.autoweek.nl/m/m1ny1lrbl1fl_480.jpg", "?");
         OpelMS.setHeight("480px");
@@ -100,22 +173,22 @@ public class MainView extends VerticalLayout {
         FormLayout lay = new FormLayout(title);
         FormLayout lay2 = new FormLayout(header);
         FormLayout carimg = new FormLayout(OpelAC, OpelCB);
-        FormLayout buttons = new FormLayout(b1, b2);
         FormLayout Inf1 = new FormLayout(ACInf, CBInf);
+        FormLayout buttons = new FormLayout(b1, b2);
 
         FormLayout carimg2 = new FormLayout(OpelMC, OpelAS);
-        FormLayout buttons2 = new FormLayout(b3, b4);
         FormLayout Inf2 = new FormLayout(MCInf, ASInf);
+        FormLayout buttons2 = new FormLayout(b3, b4);
 
         FormLayout carimg3 = new FormLayout(OpelICT, OpelZC);
-        FormLayout buttons3 = new FormLayout(b5, b6);
         FormLayout Inf3 = new FormLayout(ICTInf, ZCInf);
+        FormLayout buttons3 = new FormLayout(b5, b6);
 
         FormLayout carimg4 = new FormLayout(OpelMS, logo);
-        FormLayout buttons4 = new FormLayout(b7);
         FormLayout Inf4 = new FormLayout(MSInf);
+        FormLayout buttons4 = new FormLayout(b7);
 
-
+        
         add(lay, lay2, dir, carimg, Inf1, buttons, carimg2, Inf2, buttons2, carimg3, Inf3, buttons3, carimg4, Inf4, buttons4);
     }
 
