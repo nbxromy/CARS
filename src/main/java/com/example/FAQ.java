@@ -12,11 +12,15 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @Route(value="FAQ")
+@PageTitle("Frequently Asked Questions")
 @CssImport("./styles/styles.css")
 public class FAQ extends VerticalLayout {
+
+    private static final long serialVersionUID = 1L;
 
     public FAQ() {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
@@ -60,36 +64,33 @@ public class FAQ extends VerticalLayout {
         menuItemFaq.addClickListener(e -> menuItemFaq.getUI().ifPresent(ui -> ui.navigate("FAQ")));
         MenuItem menuItemCorona = menuBar.addItem("COVID-19");
         menuItemCorona.addClickListener(e -> menuItemCorona.getUI().ifPresent(ui -> ui.navigate("Corona")));
-        // MenuItem menuItemLogin;
-        // if (!Application.loggedIn) {
-        //     menuItemLogin = menuBar.addItem("Login");
-        //     menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
-        //     menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Login")));
-        // } else {
-        //     menuItemLogin = menuBar.addItem("Profile");
-        //     menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
-        //     menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Profile")));
-        // }
+        MenuItem menuItemReview = menuBar.addItem("Reviews");
+        menuItemReview.addClickListener(e -> menuItemReview.getUI().ifPresent(ui -> ui.navigate("Reviews")));
+        MenuItem menuItemLogin;
+        if (SessionAttributes.getLoggedIn() == null || SessionAttributes.getLoggedIn() == "false") {
+            menuItemLogin = menuBar.addItem("Login");
+            menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
+            menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Login")));
+        } else {
+            menuItemLogin = menuBar.addItem("Profile");
+            menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
+            menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Profile")));
+        }
 
         // Menu bar - Sub menu's 
         SubMenu subMenuRent = menuItemRent.getSubMenu();
-        MenuItem menuItemRentACar = subMenuRent.addItem("Rent a car");
-        menuItemRentACar.addClickListener(e -> menuItemRentACar.getUI().ifPresent(ui -> ui.navigate("Rent")));
         MenuItem menuItemRentInformation = subMenuRent.addItem("Information");
         menuItemRentInformation.addClickListener(e -> menuItemRentInformation.getUI().ifPresent(ui -> ui.navigate("Information")));
-        MenuItem menuItemExtras = subMenuRent.addItem("Extra options");
-        menuItemExtras.addClickListener(e -> menuItemExtras.getUI().ifPresent(ui -> ui.navigate("Extras")));
         
-        // SubMenu subMenuLogin = menuItemLogin.getSubMenu();
-        // if (!Application.loggedIn) {
-        //     MenuItem menuItemRegister = subMenuLogin.addItem("Register");
-        //     menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
-        // } else {
-        //     MenuItem menuItemRegister = subMenuLogin.addItem("Logout");
-        //     Application.loggedIn = false;
-        //     Application.loggedUser = "";
-        //     menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Login")));
-        // }
+        SubMenu subMenuLogin = menuItemLogin.getSubMenu();
+        if (SessionAttributes.getLoggedIn() == null || SessionAttributes.getLoggedIn() == "false") {
+            MenuItem menuItemRegister = subMenuLogin.addItem("Register");
+            menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
+        } else {
+            MenuItem menuItemRegister = subMenuLogin.addItem("Logout");
+            menuItemRegister.addClickListener(e -> SessionAttributes.logout());
+            menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Login")));
+        }
         add(header, menuBar);
     }
 }

@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.contextmenu.MenuItem;
@@ -26,13 +27,13 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
- 
 
 @Route("Reviews")
 @CssImport("./styles/styles.css")
 public class Reviews extends VerticalLayout {
 
     private static final long serialVersionUID = 1L;
+    
     private String[][] arrayReviews;
     static String jdbcURL = "jdbc:postgresql://localhost:5432/Test_Project";
     static String jdbcusername = "postgres";
@@ -270,12 +271,8 @@ public class Reviews extends VerticalLayout {
 
         // Menu bar - Sub menu's 
         SubMenu subMenuRent = menuItemRent.getSubMenu();
-        MenuItem menuItemRentACar = subMenuRent.addItem("Rent a car");
-        menuItemRentACar.addClickListener(e -> menuItemRentACar.getUI().ifPresent(ui -> ui.navigate("Rent")));
         MenuItem menuItemRentInformation = subMenuRent.addItem("Information");
         menuItemRentInformation.addClickListener(e -> menuItemRentInformation.getUI().ifPresent(ui -> ui.navigate("Information")));
-        MenuItem menuItemExtras = subMenuRent.addItem("Extra options");
-        menuItemExtras.addClickListener(e -> menuItemExtras.getUI().ifPresent(ui -> ui.navigate("Extras")));
         
         SubMenu subMenuLogin = menuItemLogin.getSubMenu();
         MenuItem menuItemRegister = subMenuLogin.addItem("Register");
