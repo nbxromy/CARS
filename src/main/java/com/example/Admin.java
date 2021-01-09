@@ -38,7 +38,7 @@ public class Admin extends VerticalLayout{
     private boolean isEmp;
 
     public Admin(){
-
+        setSizeFull();
         addHeader();
         
         isAdmin = true;

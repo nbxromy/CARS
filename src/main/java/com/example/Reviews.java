@@ -2,12 +2,9 @@ package com.example;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.contextmenu.MenuItem;
@@ -15,10 +12,8 @@ import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -44,96 +39,18 @@ public class Reviews extends VerticalLayout {
     static String jdbcpassword = "asd";
     public boolean loggedin= false;
 
-    public List<Reviews> reviewList = new ArrayList<>();
-    private String customerUsername;
-    private String customerReview;
-    private String customerStars;
-
     public Reviews() {
-        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        H2 title = new H2("Click on a star rating to read a review");
+
         setSizeFull();
         addClassName("reviews");
         addHeader();
-        testReviews();
-        retrieveReviews();
-        H2 pageName = new H2("You can write a review on the left and read reviews on the right");
-        pageName.getElement().getThemeList();
-        add(pageName);
         askReview();
-        //viewReviews();
+        retrieveReviews();
+        add(title);
+        viewReviews();
+    }
 
-
-        Grid<Reviews> grid = new Grid<>(Reviews.class);
-        grid.setItems(reviewList);
-        grid.removeAllColumns();
-        grid.addColumn(Reviews::getUsername).setHeader("Customer Username");
-        //grid.addColumn(Reviews::getReview).setHeader("Reviews");
-
-        grid.addColumn(Reviews::getStars).setHeader("Stars");
-        grid.addComponentColumn(review->{
-            Label label = new Label(getReview());
-            label.getStyle().set("text-align", "right");
-            label.getStyle().set("white-space","normal");
-            return label;
-        }).setHeader("Reviews").setFlexGrow(1);
-
-        add(grid);
-    }
-    public Reviews(String usn, String review, int stars){
-        super();
-        customerUsername= usn;
-        customerReview= review;
-        if(stars==1){
-            customerStars="*";
-        }
-        else if(stars==2){
-            customerStars="**";
-        }
-        else if(stars==3){
-            customerStars="***";
-        }
-        else if(stars==4){
-            customerStars="****";
-        }
-        else if(stars==5){
-            customerStars="*****";
-        }
-    }
-    public void testReviews(){
-        for(int i=0; i<15; i++){
-            reviewList.add(new Reviews(i+" Username", "A review A review A review A review A review A review A review A review A review A review A review A review A review A review A review A review A review A review", 4));
-        }
-    }
-    // public void getReviewList(){
-    //     try{
-
-    //         Connection conn = DriverManager.getConnection(Application.jdbcURL,Application.username,Application.password);
-    //         PreparedStatement checkUsnEmail = conn.prepareStatement("SELECT * FROM \"finishedbookings\" ORDER BY customerusername ASC");
-    //         ResultSet rs = checkUsnEmail.executeQuery();
-    //         while(rs.next()){
-    //             String usn = rs.getString(1);
-    //             String license = rs.getString(2);
-    //             String amount = rs.getString(3);
-    //             String begindate= rs.getString(5);
-    //             String enddate= rs.getString(6);
-    //             reviewList.add(new Booking(usn,begindate,enddate,amount,license));
-    //         }
-    //         conn.close();
-    //     }
-    //     catch(Exception e){
-            
-    //     }
-    // }
-    public String getUsername(){
-        return customerUsername;
-    }
-    public String getReview(){
-        return customerReview;
-    }
-    public String getStars(){
-        return customerStars;
-    }
- 
     // Form for writing a review
     public void askReview() {
 
@@ -169,19 +86,18 @@ public class Reviews extends VerticalLayout {
         
         sendReview.addClickListener(click->{
             if(!((Integer.parseInt(star.getValue())>=1)&(Integer.parseInt(star.getValue())<=5))){
-                Notification.show("Please use a number 1-5 for star rating", 6000, Position.TOP_CENTER);
+                Notification.show("Please use a number 1-5 for star rating", 10000, Position.TOP_CENTER);
             }
             else if(checkReview(usernameField.getValue(), passwordField.getValue())){
-                Notification.show("You are only aloud to place one review", 6000, Position.TOP_CENTER);
+                Notification.show("You are only aloud to place one review", 10000, Position.TOP_CENTER);
             }
             
             else if(checkUser(usernameField.getValue(), passwordField.getValue())){
-                sendReview(usernameField.getValue(), passwordField.getValue(), reviewField.getValue(),star.getValue());
+                insertReviewTable(usernameField.getValue(), reviewField.getValue(),star.getValue());
                 Notification.show("Review sent!", 6000, Position.TOP_CENTER);
             }
             else{
-                Notification.show("User credentials are wrong, please try again", 6000, Position.TOP_CENTER);
-                
+                Notification.show("User credentials are wrong, please try again", 10000, Position.TOP_CENTER);
             }
 
         });
@@ -221,7 +137,7 @@ public class Reviews extends VerticalLayout {
 
         try{
             Connection conn = DriverManager.getConnection(jdbcURL, jdbcusername, jdbcpassword);
-            String query = "select * from customer where username='"+username+"' and password='"+password+"'";
+            String query = "select * from customers where username='"+username+"' and password='"+password+"'";
             Statement statement = conn.createStatement();
             ResultSet rs = statement.executeQuery(query);
             if(rs.next()){
@@ -239,33 +155,60 @@ public class Reviews extends VerticalLayout {
         return userCred;
     }
 
-    // Function that'll send the review to the DB when the button is pressed.
-    public void sendReview(String usn, String password, String review, String star) {
-
-        try {
-            Application.insertReviewTable(usn, password, review, star);
-        } 
-        catch (Exception e) {
-           System.out.println(e);
-        }
-        
-    }
     
+    // Function below inserts customer review to the review table.
+    public  void insertReviewTable(String usn,String review, String star){
+        if(Integer.parseInt(star)==1){
+            star = "*";
+        }
+        else if (Integer.parseInt(star)==2){
+            star = "* *";
+        }
+        else if(Integer.parseInt(star)==3){
+            star = "* * *";
+        }
+        else if(Integer.parseInt(star)==4){
+            star = "* * * *";
+        }
+        else if(Integer.parseInt(star)==5){
+            star= "* * * * *";
+        }
+
+        try{
+            Connection conn = DriverManager.getConnection(jdbcURL, jdbcusername, jdbcpassword);
+            PreparedStatement insert = conn.prepareStatement("INSERT INTO reviewtable (username, review, star) VALUES ('"+usn+"', '"+review +"','"+ star+"')");
+            insert.executeUpdate();
+            System.out.println("Inserted");
+        }
+        catch(Exception e){
+            System.out.println(e);
+            
+        }
+    }
     // This function will load the reviews in a accordion for view
     public void viewReviews(){
         
         Accordion accordion = new Accordion();
         
         for(int i=0 ; i<arrayReviews.length;i++){
-            accordion.add(arrayReviews[i][0]+"  Stars:"+arrayReviews[i][2], new Span(arrayReviews[i][1])).addThemeVariants(DetailsVariant.FILLED);
+            accordion.add(arrayReviews[i][2], new Span(arrayReviews[i][0]+": "+arrayReviews[i][1])).addThemeVariants(DetailsVariant.FILLED);
         }
         
         add(accordion);
        
     }
+    // public void testcreate(){
+    //     arrayReviews = new String[20][];
+    //     for(int i=0 ; i<20;i++){
+    //         arrayReviews[i]= new String[2];
+    //         arrayReviews[i][0] = "*****";
+    //         arrayReviews[i][1] = "Username: A review written by the customer. The website is very good and functional as described.";
+    //     }
+    // }
 
-    // This function will retrieve the amount of rows in the DB reviewtable
-    // and put the data inside arrayReviews.
+
+    // This function will retrieve the reviews from the database and adds it to arrayreviews
+    
     public void retrieveReviews(){
 
         try {

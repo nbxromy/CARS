@@ -4,10 +4,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.joda.time.*;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -29,6 +25,7 @@ import com.vaadin.flow.router.Route;
 import org.joda.time.Days;
 
 
+
 @Route("Employee")
 @CssImport("./styles/styles.css")
 public class Employee extends VerticalLayout{
@@ -36,7 +33,9 @@ public class Employee extends VerticalLayout{
     private static final long serialVersionUID = 1L;
     public static boolean isEmployee;
     public UI ui;
+    
     public Employee(){
+        setSizeFull();
         ui = this.getUI().isPresent() ? this.getUI().get() : UI.getCurrent();
         isEmployee= true;
         addHeader();
@@ -54,17 +53,17 @@ public class Employee extends VerticalLayout{
         TextField licenseplate = new TextField("Car licenseplate");
         TextField tank = new TextField("If tank is full insert 'yes' if not 'no'");
         TextField carClean = new TextField("If car is clean insert 'yes' if not 'no'");
-        TextField carDamages = new TextField("Visible damages to the car insert 'yes' if not 'no'");
         TextField mileage = new TextField("Insert new mileage like '555887086'");
         Button finish = new Button("Finish");
-        
 
         finish.addClickListener(click-> {
-            //if
-            if(checkForumFields(licenseplate.getValue(), tank.getValue(), carClean.getValue(), carDamages.getValue(), mileage.getValue())){
-                String price =calculatePrice(tank.getValue(), carClean.getValue(), carDamages.getValue(), licenseplate.getValue());
+            
+            if(checkForumFields(licenseplate.getValue(), tank.getValue(), carClean.getValue(), mileage.getValue())){
+
+                String price =calculatePrice(tank.getValue(), carClean.getValue(), licenseplate.getValue());
+                
                 if(getBookingAndUpdate(licenseplate.getValue(),Integer.parseInt(mileage.getValue()))){
-                    ui.access(()->Notification.show(price, 10000, Position.TOP_CENTER));
+                    ui.access(()->Notification.show(price, 20000, Position.TOP_CENTER));
                 }
                 else{
                     Notification.show("Booking not found, check customer username and booking delivery date", 10000, Position.TOP_CENTER);
@@ -73,21 +72,21 @@ public class Employee extends VerticalLayout{
             }
         });
         
-        form.add(title,licenseplate, tank, carClean, carDamages, mileage, finish);
+        form.add(title,licenseplate, tank, carClean, mileage, finish);
         add(form);
     }
 
     // Checks all forum fields
-    public boolean checkForumFields(String license, String carTank, String carClean, String carDamages, String newMileage){
+    public boolean checkForumFields(String license, String carTank, String carClean, String newMileage){
         
         boolean checkMileage=false;
         int inputmileage=0;
 
-        if(license.equals("") || carTank.equals("")||carClean.equals("")||carDamages.equals("")||newMileage.equals("")){
+        if(license.equals("") || carTank.equals("")||carClean.equals("")||newMileage.equals("")){
             Notification.show("Please fill in the form", 10000, Position.TOP_CENTER);
             return false;
         }
-        else if(!((carTank.equals("no")||carTank.equals("yes"))&& (carClean.equals("yes")||carClean.equals("no"))&&(carDamages.equals("yes")||carDamages.equals("no")))){
+        else if(!((carTank.equals("no")||carTank.equals("yes"))&& (carClean.equals("yes")||carClean.equals("no")))){
             Notification.show("Form inputs are wrong, please fill in 'yes' or 'no'", 10000, Position.TOP_CENTER);
             return false;
         }
@@ -101,7 +100,6 @@ public class Employee extends VerticalLayout{
                 System.out.println(e);
                 checkMileage=false;
             }
-
             
             if(checkMileage==false){
                 Notification.show("Mileage input is wrong", 8000, Position.TOP_CENTER);
@@ -112,19 +110,18 @@ public class Employee extends VerticalLayout{
     }
 
     
-    // Gets the needed booking data to move the booking to (finished) bookings.
-    // Also updates the car table with the new mileage 
+    // Finds the booking in the database, inserts the delivery date.
+    // Also updates the new mileage in the database.
     public boolean getBookingAndUpdate(String license, int newMileage){
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");  
-        Date currentdate = new Date();  
-    
+        LocalDate currentdate = new LocalDate();
+        
         try{
             Connection conn = DriverManager.getConnection(Application.jdbcURL,Application.username,Application.password);
-            PreparedStatement getbooking = conn.prepareStatement("SELECT * FROM \"finishedbookings\" WHERE carlicenseplate='"+license+"' AND deliverydate is null");
+            PreparedStatement getbooking = conn.prepareStatement("SELECT * FROM \"reservations\" WHERE licenseplate='"+license+"' AND pickupdate<'"+currentdate +"' and deliverydate is null");
             ResultSet rs = getbooking.executeQuery();
             
             if(rs.next()){
-                PreparedStatement updateDeliverydate = conn.prepareStatement("UPDATE finishedbookings set deliverydate='"+formatter.format(currentdate)+"'");
+                PreparedStatement updateDeliverydate = conn.prepareStatement("UPDATE reservations set deliverydate='"+currentdate+"' WHERE licenseplate='"+license+"' and pickupdate<'"+currentdate+"' and deliverydate is null");
                 updateDeliverydate.executeUpdate();
                
                 PreparedStatement updateCar = conn.prepareStatement("UPDATE \"Cars\" SET mileage="+newMileage +" WHERE \"licensePlate\"='"+license+"'");
@@ -142,32 +139,47 @@ public class Employee extends VerticalLayout{
         return true;
     }
 
-    // Calculate if there are extra costs (tank full, car clean, delivering later than booking delivery date)
-    public String calculatePrice(String tank, String clean, String damages, String license){
+    // Calculates the final price and updates it in the database.
+    // Customer can pay online when the booking is made, however extra costs are still possible.
+    public String calculatePrice(String tank, String clean, String license){
         int extraCosts = 0;
-        String total= "";
+        int total= 0;
+        String stringPrice ="";
         LocalDate deliveryDate = new LocalDate();
 
         if(tank.equals("no")){
             extraCosts += 50;
-            
+            stringPrice += "Extra tank costs = 50.00\n";
+        }
+        if(clean.equals("no")){
+            extraCosts += 30;
+            stringPrice += "Extra cleaning costs = 30.00\n";
         }
         
-        else if(clean.equals("no")){
-            extraCosts += 30;
-        }
-  
         try{
             Connection conn = DriverManager.getConnection(Application.jdbcURL,Application.username,Application.password);
-            PreparedStatement getTotalamount = conn.prepareStatement("SELECT * FROM \"finishedbookings\" WHERE carlicenseplate='"+license+"' AND deliverydate is null");
+            PreparedStatement getTotalamount = conn.prepareStatement("SELECT * FROM \"reservations\" WHERE licenseplate='"+license+"' AND pickupdate <'"+deliveryDate+"' AND deliverydate is null");
             ResultSet rs = getTotalamount.executeQuery();
             if(rs.next()){
-                total = rs.getString(3);
-                LocalDate endDate = LocalDate.parse(rs.getString(6));
-                int days = Days.daysBetween(endDate,deliveryDate).getDays();
+
+                LocalDate endDate = LocalDate.parse(rs.getString(8));
+                int days= Days.daysBetween(endDate,deliveryDate).getDays();
                 
                 if(days>0){
-                    extraCosts = extraCosts+ (days*25);
+                    extraCosts = extraCosts+ (days*40);
+                    stringPrice += "Late delivery = 40.00 per day\n";
+                }
+                if(rs.getBoolean(11)){
+                    stringPrice += "||TOTAL PRICE: "+extraCosts +"||";
+                    int alreadyPaid= rs.getInt(10);
+                    PreparedStatement updatePrice = conn.prepareStatement("UPDATE reservations SET price="+(alreadyPaid+extraCosts)+ "WHERE licenseplate='"+license+"' AND pickupdate <'"+deliveryDate+"' AND deliverydate is null");
+                    updatePrice.executeUpdate();
+                }
+                else{
+                    total = rs.getInt(10);
+                    stringPrice += "||TOTAL PRICE: "+(extraCosts+total+"||");
+                    PreparedStatement updatePrice = conn.prepareStatement("UPDATE reservations SET price="+(total+extraCosts)+ ", ispaid= true WHERE licenseplate='"+license+"' AND pickupdate <'"+deliveryDate+"' AND deliverydate is null");
+                    updatePrice.executeUpdate();
                 }
             }
             conn.close();
@@ -176,9 +188,7 @@ public class Employee extends VerticalLayout{
             System.out.println("Failed to calculate price: "+e);
             Notification.show("Failed to calculate price",6000,Position.TOP_CENTER);
         }
-    
-        return ("Extra costs: "+extraCosts+"| DB amount:"+total);
-        
+        return (stringPrice);
     }
 
 
@@ -186,6 +196,7 @@ public class Employee extends VerticalLayout{
     public static boolean getEmployee(){
         return isEmployee;
     }
+
     public void addHeader() {
         // Header
         H1 header = new H1("QARS");

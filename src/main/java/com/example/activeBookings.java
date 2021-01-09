@@ -1,18 +1,14 @@
 package com.example;
 
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
-
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
@@ -61,12 +57,12 @@ public class activeBookings extends VerticalLayout{
     }
     // Ervoor zorgen dat de row hoogte groter wordt, bij lange tekst (wrap) of css
     //  http://www.w3schools.com/cssref/css3_pr_word-wrap.asp https://vaadin.com/forum/thread/15297878/15302575
-    public activeBookings(String usn, String begindate, String enddate,String deliverydate,String amount, String license){
+    public activeBookings(String usn, String begindate, String enddate,String amount, String license){
         super();
         customerUsername = usn;
         beginDate = begindate;
         endDate = enddate;
-        deliveryDate = deliverydate;
+       
         Amount = amount;
         carLicenseplate = license;
         
@@ -75,16 +71,16 @@ public class activeBookings extends VerticalLayout{
         try{
 
             Connection conn = DriverManager.getConnection(Application.jdbcURL,Application.username,Application.password);
-            PreparedStatement checkUsnEmail = conn.prepareStatement("SELECT * FROM \"finishedbookings\" WHERE deliverydate is null ORDER BY customerusername ASC");
+            PreparedStatement checkUsnEmail = conn.prepareStatement("SELECT * FROM \"reservations\" WHERE deliverydate is null ORDER BY customerusername ASC");
             ResultSet rs = checkUsnEmail.executeQuery();
             while(rs.next()){
-                String usn = rs.getString(1);
-                String license = rs.getString(2);
-                String amount = rs.getString(3);
-                String begindate= rs.getString(5);
-                String enddate= rs.getString(6);
-                String deliverydate = rs.getString(7);
-                bookingList.add(new activeBookings(usn,begindate,enddate,deliverydate,amount,license));
+                String usn = rs.getString(4);
+                String license = rs.getString(3);
+                String amount = rs.getString(10);
+                String begindate= rs.getString(6);
+                String enddate= rs.getString(8);
+                
+                bookingList.add(new activeBookings(usn,begindate,enddate,amount,license));
             }
             conn.close();
         }

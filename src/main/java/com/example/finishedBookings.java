@@ -43,7 +43,6 @@ public class finishedBookings extends VerticalLayout{
         getBookings();
         H2 title = new H2("Completed booking list");
     
-
         Grid<finishedBookings> grid = new Grid<>(finishedBookings.class);
         grid.setItems(bookingList);
         grid.removeAllColumns();
@@ -56,8 +55,7 @@ public class finishedBookings extends VerticalLayout{
 
         add(title,grid);
     }
-    // Ervoor zorgen dat de row hoogte groter wordt, bij lange tekst (wrap) of css
-    //  http://www.w3schools.com/cssref/css3_pr_word-wrap.asp https://vaadin.com/forum/thread/15297878/15302575
+
     public finishedBookings(String usn, String begindate, String enddate,String deliverydate, String amount, String license){
         super();
         customerUsername = usn;
@@ -72,21 +70,21 @@ public class finishedBookings extends VerticalLayout{
         try{
 
             Connection conn = DriverManager.getConnection(Application.jdbcURL,Application.username,Application.password);
-            PreparedStatement checkUsnEmail = conn.prepareStatement("SELECT * FROM \"finishedbookings\" WHERE deliverydate is not null ORDER BY customerusername ASC");
+            PreparedStatement checkUsnEmail = conn.prepareStatement("SELECT * FROM \"reservations\" WHERE deliverydate is not null ORDER BY username ASC");
             ResultSet rs = checkUsnEmail.executeQuery();
             while(rs.next()){
-                String usn = rs.getString(1);
-                String license = rs.getString(2);
-                String amount = rs.getString(3);
-                String begindate= rs.getString(5);
-                String enddate= rs.getString(6);
-                String deliverydate= rs.getString(7);
+                String usn = rs.getString(4);
+                String license = rs.getString(3);
+                String amount = rs.getString(10);
+                String begindate= rs.getString(6);
+                String enddate= rs.getString(8);
+                String deliverydate= rs.getString(17);
                 bookingList.add(new finishedBookings(usn,begindate,enddate,deliverydate,amount,license));
             }
             conn.close();
         }
         catch(Exception e){
-            
+            System.out.println("GetBookings:" +e);
         }
     }
 
