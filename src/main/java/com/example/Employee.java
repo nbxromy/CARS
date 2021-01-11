@@ -39,13 +39,18 @@ public class Employee extends VerticalLayout{
         ui = this.getUI().isPresent() ? this.getUI().get() : UI.getCurrent();
         isEmployee= true;
         addHeader();
+    
         employeeForm();
+        
         
     }
 
 
 
     public void employeeForm(){
+        H2 inf = new H2("Employee page");
+        H2 text = new H2("Possible extra costs for customer!");
+        add(inf,text);
         FormLayout form = new FormLayout();
         form.setMaxWidth("22em");
         form.addClassName("empForm");
@@ -75,6 +80,7 @@ public class Employee extends VerticalLayout{
         form.add(title,licenseplate, tank, carClean, mileage, finish);
         add(form);
     }
+ 
 
     // Checks all forum fields
     public boolean checkForumFields(String license, String carTank, String carClean, String newMileage){
@@ -196,6 +202,9 @@ public class Employee extends VerticalLayout{
     public static boolean getEmployee(){
         return isEmployee;
     }
+    public static void changeIsEmployee(boolean changeTo){
+        isEmployee = changeTo;
+    }
 
     public void addHeader() {
         // Header
@@ -224,11 +233,6 @@ public class Employee extends VerticalLayout{
         MenuItem menuItemReview = menuBar.addItem("Reviews");
         menuItemReview.addClickListener(e -> menuItemReview.getUI().ifPresent(ui -> ui.navigate("Reviews")));
        
-        if(Employee.getEmployee()){
-            MenuItem menuItemReservation = menuBar.addItem("Employee");
-            menuItemReservation.addClickListener(e -> menuItemReservation.getUI().ifPresent(ui -> ui.navigate("Employee")));
-        }
-         
 
         // Menu bar - Sub menu's 
         SubMenu subMenuRent = menuItemRent.getSubMenu();
@@ -242,6 +246,36 @@ public class Employee extends VerticalLayout{
         SubMenu subMenuLogin = menuItemLogin.getSubMenu();
         MenuItem menuItemRegister = subMenuLogin.addItem("Register");
         menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
+
+        // If neither admin or employee is logged in, show employee login menu.
+        if((SessionAttributes.getEmployeeLogin()=="false" || SessionAttributes.getEmployeeLogin() == null)&& (SessionAttributes.getAdminLogin()=="false" || SessionAttributes.getAdminLogin()== null)){
+            MenuItem menuItemEmployeeLogin = subMenuLogin.addItem("Employee login");
+            menuItemEmployeeLogin.addClickListener(e -> menuItemEmployeeLogin.getUI().ifPresent(ui -> ui.navigate("employeeLogin")));
+        }
+        // If employee is logged in, show employee menu
+        MenuItem menuItemEmployee;
+        if(SessionAttributes.getEmployeeLogin() =="true"){
+            menuItemEmployee = menuBar.addItem("Employee");
+            menuItemEmployee.addClickListener(e -> menuItemEmployee.getUI().ifPresent(ui -> ui.navigate("Employee")));
+            MenuItem menuItemEmployeeLogin = subMenuLogin.addItem("Employee log out");
+            menuItemEmployeeLogin.addClickListener(e -> SessionAttributes.employeeLogout());
+            menuItemEmployeeLogin.addClickListener(e -> menuItemEmployeeLogin.getUI().ifPresent(ui -> ui.navigate("FAQ")));
+        }
+        // If admin is logged in, show admin menu
+        MenuItem menuItemAdmin;
+        if(SessionAttributes.getAdminLogin()=="true"){
+            menuItemAdmin = menuBar.addItem("Admin");
+            menuItemAdmin.addClickListener(e -> menuItemAdmin.getUI().ifPresent(ui -> ui.navigate("Admin")));
+            
+            SubMenu subMenuAdmin = menuItemAdmin.getSubMenu();
+            MenuItem menuItemActiveBookings = subMenuAdmin.addItem("Active bookings");
+            menuItemActiveBookings.addClickListener(e -> menuItemAdmin.getUI().ifPresent(ui -> ui.navigate("activeBookings")));
+            MenuItem menuItemFinishedBookings = subMenuAdmin.addItem("Finished bookings");
+            menuItemFinishedBookings.addClickListener(e -> menuItemAdmin.getUI().ifPresent(ui -> ui.navigate("finishedBookings")));
+            MenuItem menuItemAdminLogin = subMenuLogin.addItem("Admin logout");
+            menuItemAdminLogin.addClickListener(e -> SessionAttributes.adminLogout());
+            menuItemAdminLogin.addClickListener(e -> menuItemAdminLogin.getUI().ifPresent(ui -> ui.navigate("FAQ")));
+        }
         add(header, menuBar);
     }
 }

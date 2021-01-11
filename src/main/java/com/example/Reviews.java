@@ -55,9 +55,6 @@ public class Reviews extends VerticalLayout {
     // Form for writing a review
     public void askReview() {
 
-        // Todo: If user is logged in (need credentials for DB table) ->
-        //       different form, without usn/pass
-
         FormLayout reviewLayout = new FormLayout();
         reviewLayout.addClassName("reviewLayout");
         H2 formHeader = new H2("Write a review here"); 
@@ -198,17 +195,6 @@ public class Reviews extends VerticalLayout {
         add(accordion);
        
     }
-    // public void testcreate(){
-    //     arrayReviews = new String[20][];
-    //     for(int i=0 ; i<20;i++){
-    //         arrayReviews[i]= new String[2];
-    //         arrayReviews[i][0] = "*****";
-    //         arrayReviews[i][1] = "Username: A review written by the customer. The website is very good and functional as described.";
-    //     }
-    // }
-
-
-    // This function will retrieve the reviews from the database and adds it to arrayreviews
     
     public void retrieveReviews(){
 
@@ -277,6 +263,36 @@ public class Reviews extends VerticalLayout {
         SubMenu subMenuLogin = menuItemLogin.getSubMenu();
         MenuItem menuItemRegister = subMenuLogin.addItem("Register");
         menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
+
+        // If neither admin or employee is logged in, show employee login menu.
+        if((SessionAttributes.getEmployeeLogin()=="false" || SessionAttributes.getEmployeeLogin() == null)&& (SessionAttributes.getAdminLogin()=="false" || SessionAttributes.getAdminLogin()== null)){
+            MenuItem menuItemEmployeeLogin = subMenuLogin.addItem("Employee login");
+            menuItemEmployeeLogin.addClickListener(e -> menuItemEmployeeLogin.getUI().ifPresent(ui -> ui.navigate("employeeLogin")));
+        }
+        // If employee is logged in, show employee menu
+        MenuItem menuItemEmployee;
+        if(SessionAttributes.getEmployeeLogin() =="true"){
+            menuItemEmployee = menuBar.addItem("Employee");
+            menuItemEmployee.addClickListener(e -> menuItemEmployee.getUI().ifPresent(ui -> ui.navigate("Employee")));
+            MenuItem menuItemEmployeeLogin = subMenuLogin.addItem("Employee log out");
+            menuItemEmployeeLogin.addClickListener(e -> SessionAttributes.employeeLogout());
+            menuItemEmployeeLogin.addClickListener(e -> menuItemEmployeeLogin.getUI().ifPresent(ui -> ui.navigate("FAQ")));
+        }
+        // If admin is logged in, show admin menu
+        MenuItem menuItemAdmin;
+        if(SessionAttributes.getAdminLogin()=="true"){
+            menuItemAdmin = menuBar.addItem("Admin");
+            menuItemAdmin.addClickListener(e -> menuItemAdmin.getUI().ifPresent(ui -> ui.navigate("Admin")));
+            
+            SubMenu subMenuAdmin = menuItemAdmin.getSubMenu();
+            MenuItem menuItemActiveBookings = subMenuAdmin.addItem("Active bookings");
+            menuItemActiveBookings.addClickListener(e -> menuItemAdmin.getUI().ifPresent(ui -> ui.navigate("activeBookings")));
+            MenuItem menuItemFinishedBookings = subMenuAdmin.addItem("Finished bookings");
+            menuItemFinishedBookings.addClickListener(e -> menuItemAdmin.getUI().ifPresent(ui -> ui.navigate("finishedBookings")));
+            MenuItem menuItemAdminLogin = subMenuLogin.addItem("Admin logout");
+            menuItemAdminLogin.addClickListener(e -> SessionAttributes.adminLogout());
+            menuItemAdminLogin.addClickListener(e -> menuItemAdminLogin.getUI().ifPresent(ui -> ui.navigate("FAQ")));
+        }
         add(header, menuBar);
     }    
 }
