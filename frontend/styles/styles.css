@@ -22,6 +22,8 @@
 .profile {
     background-color: #f7f7f7;
 } 
+
+/* STYLES REVIEW PAGE */
 .reviewLayout{
     padding-left: 2em;
     padding-right: 2em;
@@ -49,5 +51,3 @@ H1 {
     width: 100%;
 
 }
-
-

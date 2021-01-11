@@ -62,6 +62,7 @@ public class Rent extends VerticalLayout {
     private CheckboxGroup<String> checkboxExtras = new CheckboxGroup<>();
 
     public Rent() {
+        // Check if the user is logged in
         if (SessionAttributes.getLoggedIn() != null || SessionAttributes.getLoggedIn() == "true") {            
             setDefaultHorizontalComponentAlignment(Alignment.CENTER);
             setSizeFull();
@@ -109,19 +110,23 @@ public class Rent extends VerticalLayout {
             // Confirm button which redirects to Payment
             Button confirmButton = new Button("Confirm choice and proceed to pay with credit card");
             confirmButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-            confirmButton.addClickListener(e -> checkDatesAndTimes(pickupDatePicker.getValue(), pickupTimePicker.getValue(), dropoffDatePicker.getValue(), dropoffTimePicker.getValue(), errorMessage, true));
+            confirmButton.addClickListener(e -> checkDatesAndTimes(pickupDatePicker.getValue(), pickupTimePicker.getValue(), 
+                dropoffDatePicker.getValue(), dropoffTimePicker.getValue(), errorMessage, true));
 
             // Confirm button which redirects to Profile Reservations
             Button confirmButton2 = new Button("Confirm choice and proceed to pay on location");
             confirmButton2.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
-            confirmButton2.addClickListener(e -> checkDatesAndTimes(pickupDatePicker.getValue(), pickupTimePicker.getValue(), dropoffDatePicker.getValue(), dropoffTimePicker.getValue(), errorMessage, false));
+            confirmButton2.addClickListener(e -> checkDatesAndTimes(pickupDatePicker.getValue(), pickupTimePicker.getValue(), 
+                dropoffDatePicker.getValue(), dropoffTimePicker.getValue(), errorMessage, false));
 
             // Cancel button to cancel reservation and redirect to Homepage
             Button cancelButton = new Button("Cancel");
             cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
             cancelButton.addClickListener(e -> UI.getCurrent().navigate(""));
 
-            add(title, carField, licencePlateField, pickupLocationField, pickupDatePicker, pickupTimePicker, dropoffDatePicker, dropoffTimePicker, checkboxExtras, calculateButton, priceMessage, errorMessage, confirmButton, confirmButton2, cancelButton);
+            add(title, carField, licencePlateField, pickupLocationField, pickupDatePicker, pickupTimePicker, dropoffDatePicker, 
+                dropoffTimePicker, checkboxExtras, calculateButton, priceMessage, errorMessage, confirmButton, confirmButton2, 
+                cancelButton);
         } else {
             UI.getCurrent().navigate("Login");
             UI.getCurrent().getPage().reload();
@@ -168,31 +173,52 @@ public class Rent extends VerticalLayout {
     }
 
     // Function to check if user entered valid dates and times
-    public void checkDatesAndTimes(LocalDate pickupDate, LocalTime pickupTime, LocalDate dropoffDate, LocalTime dropoffTime, Span errorMessage, boolean payed) {  
+    public void checkDatesAndTimes(LocalDate pickupDate, LocalTime pickupTime, LocalDate dropoffDate, LocalTime dropoffTime, 
+        Span errorMessage, boolean payed) {  
+        
+        // Check if the pickup date and time are filled in, if not show an error message
         if (pickupDate == null || pickupTime == null) {
             errorMessage.setText("Please enter the pick up date and time");
-        } else if (dropoffDate == null || dropoffTime == null) {
+        } 
+        // Check if the dropoff date and time are filled in, if not show an error message
+        else if (dropoffDate == null || dropoffTime == null) {
             errorMessage.setText("Please enter the drop off date and time");
-        } else if (pickupDate.isBefore(today)) {
+        } 
+        // Check if the pickup date is after today, if not show an error message
+        else if (pickupDate.isBefore(today)) {
             errorMessage.setText("Please enter a valid pickup date");
-        } else if (pickupDate.isAfter(today.plusYears(1))) {
+        } 
+        // Check if the pickup date is not longer than a year from now on, if not show an error message
+        else if (pickupDate.isAfter(today.plusYears(1))) {
             errorMessage.setText("You can't rent a car for the next year");
-        } else if (dropoffDate.isBefore(pickupDate) || dropoffDate.isBefore(today)) {
+        } 
+        // Check if the dropoff date is after now and is after the pickup date, if not show an error message
+        else if (dropoffDate.isBefore(pickupDate) || dropoffDate.isBefore(today)) {
             errorMessage.setText("Please enter a valid dropoff date");
-        } else if (dropoffDate.isAfter(pickupDate.plusMonths(1))) {
+        } 
+        // Check if the rental is not taking longer than a month in once, if not show an error message
+        else if (dropoffDate.isAfter(pickupDate.plusMonths(1))) {
             errorMessage.setText("You can rent a car for a maximum of one month in a row");
-        } else if (pickupTime.isBefore(LocalTime.parse("08:00:00")) || pickupTime.isAfter(LocalTime.parse("22:00:00"))) {
+        } 
+        // Check if the pickup time is between opening hours, if not show an error message
+        else if (pickupTime.isBefore(LocalTime.parse("08:00:00")) || pickupTime.isAfter(LocalTime.parse("22:00:00"))) {
             errorMessage.setText("Please enter a pick up time between working hours (08:00-22:00)");
-        } else if (dropoffTime.isBefore(LocalTime.parse("08:00:00")) || dropoffTime.isAfter(LocalTime.parse("22:00:00"))) {
+        } 
+        // Check if the dropoff time is between opening hours, if not show an error message
+        else if (dropoffTime.isBefore(LocalTime.parse("08:00:00")) || dropoffTime.isAfter(LocalTime.parse("22:00:00"))) {
             errorMessage.setText("Please enter a drop off time between working hours (08:00-22:00)");
-        } else {
+        } 
+        // If all checks are OK, calculate total price and create reservation
+        else {
             calculatePrice();
-            createReservation(carField.getValue(), licencePlateField.getValue(), pickupLocationField.getValue(), pickupDate, pickupTime, dropoffDate, dropoffTime, price, payed);
+            createReservation(carField.getValue(), licencePlateField.getValue(), pickupLocationField.getValue(), pickupDate,
+                pickupTime, dropoffDate, dropoffTime, price, payed);
         }
     }
 
     // Function to create a reservation and store in database
-    public void createReservation(String car, String licencePlate, String pickupLocation, LocalDate pickupDate, LocalTime pickupTime, LocalDate dropoffDate, LocalTime dropoffTime, int totalPrice, boolean payed) {
+    public void createReservation(String car, String licencePlate, String pickupLocation, LocalDate pickupDate, 
+        LocalTime pickupTime, LocalDate dropoffDate, LocalTime dropoffTime, int totalPrice, boolean payed) {
         Set<String> extras = checkboxExtras.getValue();
         boolean hasGPS = false;
         boolean hasInsurance = false;
@@ -220,7 +246,11 @@ public class Rent extends VerticalLayout {
         // Connect to database and create reservation
         try {
             Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
-            String sql = "INSERT INTO reservations (carname, licenceplate, username, location, pickupdate, pickuptime, dropoffdate, dropofftime, price, ispaid, gps, insurance, wintertires, extradriver, childseat) VALUES ('"+car+"', '"+licencePlate+"', '"+SessionAttributes.getLoggedUser()+"', '"+pickupLocation+"', '"+pickupDate+"', '"+pickupTime+"', '"+dropoffDate+"', '"+dropoffTime+"', '"+price+"', '"+payed+"', '"+hasGPS+"', '"+hasInsurance+"', '"+hasWinterTires+"', '"+hasExtraDriver+"', '"+hasChildSeat+"')";
+            String sql = "INSERT INTO reservations (carname, licenceplate, username, location, pickupdate, pickuptime, "+
+                "dropoffdate, dropofftime, price, ispaid, gps, insurance, wintertires, extradriver, childseat) VALUES ('"+
+                car+"', '"+licencePlate+"', '"+SessionAttributes.getLoggedUser()+"', '"+pickupLocation+"', '"+pickupDate+
+                "', '"+pickupTime+"', '"+dropoffDate+"', '"+dropoffTime+"', '"+price+"', '"+payed+"', '"+hasGPS+"', '"+
+                hasInsurance+"', '"+hasWinterTires+"', '"+hasExtraDriver+"', '"+hasChildSeat+"')";
             Statement statement = connection.createStatement();
             statement.executeUpdate(sql);
             connection.close();
@@ -284,10 +314,9 @@ public class Rent extends VerticalLayout {
         } else {
             MenuItem menuItemReservations = subMenuLogin.addItem("Reservations");
             menuItemReservations.addClickListener(e -> menuItemReservations.getUI().ifPresent(ui -> ui.navigate("ProfileReservations")));
-            MenuItem menuItemRegister = subMenuLogin.addItem("Logout");
-            menuItemRegister.addClickListener(e -> SessionAttributes.logout());
-            menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Login")));
+            MenuItem menuItemLogout = subMenuLogin.addItem("Logout");
+            menuItemLogout.addClickListener(e -> SessionAttributes.logout());
+            menuItemLogout.addClickListener(e -> menuItemLogout.getUI().ifPresent(ui -> ui.navigate("Login")));
         }
-        add(header, menuBar);
     }
 }

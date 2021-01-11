@@ -39,6 +39,7 @@ public class Payment extends VerticalLayout {
     private Button submit = new Button("Submit");
 
     public Payment() {
+        // Check if the user is logged in
         if (SessionAttributes.getLoggedIn() != null || SessionAttributes.getLoggedIn() == "true") {
             setDefaultHorizontalComponentAlignment(Alignment.CENTER);
             setSizeFull();
@@ -156,9 +157,9 @@ public class Payment extends VerticalLayout {
         } else {
             MenuItem menuItemReservations = subMenuLogin.addItem("Reservations");
             menuItemReservations.addClickListener(e -> menuItemReservations.getUI().ifPresent(ui -> ui.navigate("ProfileReservations")));
-            MenuItem menuItemRegister = subMenuLogin.addItem("Logout");
-            menuItemRegister.addClickListener(e -> SessionAttributes.logout());
-            menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Login")));
+            MenuItem menuItemLogout = subMenuLogin.addItem("Logout");
+            menuItemLogout.addClickListener(e -> SessionAttributes.logout());
+            menuItemLogout.addClickListener(e -> menuItemLogout.getUI().ifPresent(ui -> ui.navigate("Login")));
         }
         add(header, menuBar);
     }

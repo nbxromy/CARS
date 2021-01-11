@@ -38,16 +38,17 @@ public class Login extends VerticalLayout {
     private String jdbcPassword = "asdf";
 
     public Login() {
+        // Check if the user is not logged in
         if (SessionAttributes.getLoggedIn() == null || SessionAttributes.getLoggedIn() == "false") {
             setDefaultHorizontalComponentAlignment(Alignment.CENTER);
             setSizeFull();
             addClassName("login");
             addHeader();
 
-            // Front-end login form 
             H2 pageName = new H2("Log in");
             pageName.getElement().getThemeList();
 
+            // Front-end login form 
             TextField usernameField = new TextField("User name");
             usernameField.setRequired(true);
             PasswordField passwordField = new PasswordField("Password");
@@ -60,7 +61,8 @@ public class Login extends VerticalLayout {
             FormLayout layout = new FormLayout(pageName, usernameField, passwordField, errorMessage, loginButton);
             layout.setMaxWidth("300px");
             layout.getStyle().set("margin", "0 auto");
-            layout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP), new FormLayout.ResponsiveStep("490px", 2, FormLayout.ResponsiveStep.LabelsPosition.TOP));
+            layout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP), 
+                new FormLayout.ResponsiveStep("490px", 2, FormLayout.ResponsiveStep.LabelsPosition.TOP));
             layout.setColspan(pageName, 2);
             layout.setColspan(errorMessage, 2);
             layout.setColspan(loginButton, 2);
@@ -83,17 +85,21 @@ public class Login extends VerticalLayout {
         String username = usernameField.getValue();
         String password = passwordField.getValue();
 
+        // Check if all fields are filled in
         if (usernameField.isEmpty() || passwordField.isEmpty()) {
             error.setText("Fill in all fields!");
         } else {
             correctUsername = checkUsername(username);
+            // Check if username already exists
             if (!correctUsername) {
                 error.setText("Username does not exist");
             } else {
                 correctPassword = checkPassword(username, password);
+                // Check if password belongs to the username 
                 if (!correctPassword) {
                     error.setText("Password is not correct");
                 } else {
+                    // Login user and navigate to user profile page
                     SessionAttributes.login(username);
                     UI.getCurrent().navigate("Profile");
                 }
@@ -189,9 +195,11 @@ public class Login extends VerticalLayout {
             MenuItem menuItemRegister = subMenuLogin.addItem("Register");
             menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
         } else {
-            MenuItem menuItemRegister = subMenuLogin.addItem("Logout");
-            menuItemRegister.addClickListener(e -> SessionAttributes.logout());
-            menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Login")));
+            MenuItem menuItemReservations = subMenuLogin.addItem("Reservations");
+            menuItemReservations.addClickListener(e -> menuItemReservations.getUI().ifPresent(ui -> ui.navigate("ProfileReservations")));
+            MenuItem menuItemLogout = subMenuLogin.addItem("Logout");
+            menuItemLogout.addClickListener(e -> SessionAttributes.logout());
+            menuItemLogout.addClickListener(e -> menuItemLogout.getUI().ifPresent(ui -> ui.navigate("Login")));
         }
         add(header, menuBar);
     }

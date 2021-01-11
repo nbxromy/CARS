@@ -71,6 +71,7 @@ public class Profile extends VerticalLayout {
 
     // Profile of the logged in user 
     public Profile() {
+        // Check if the user is logged in
         if (SessionAttributes.getLoggedIn() != null && SessionAttributes.getLoggedIn() == "true") {
             setDefaultHorizontalComponentAlignment(Alignment.CENTER);
             setSizeFull();
@@ -139,7 +140,8 @@ public class Profile extends VerticalLayout {
             licenceIcon.setColor("lightblue");
             licenceLayout.add(licenceIcon, bsnField, documentnumberField);
             information.add("Drivers Licence", licenceLayout).addThemeVariants(DetailsVariant.FILLED);
-    
+            
+            // Fill all fields with database credentials of logged in user
             fillPersonalDetails(SessionAttributes.getLoggedUser());
             
             // Buttons to update or reset personal details with database
@@ -187,14 +189,21 @@ public class Profile extends VerticalLayout {
                 zipField.setValue(resultset.getString("zip"));
                 cityField.setValue(resultset.getString("city"));
                 countrycodeField.setValue(resultset.getString("countrycode"));
-
                 phonenumberField.setValue(resultset.getString("phonenumber"));
                 emailField.setValue(resultset.getString("emailaddress"));
 
-                if (resultset.getString("bsn") != null) { bsnField.setValue(resultset.getString("bsn")); }
-                else { bsnField.setValue(""); }
-                if (resultset.getString("documentnumber") != null) { documentnumberField.setValue(resultset.getString("documentnumber")); }
-                else { documentnumberField.setValue(""); }
+                // Check if BSN and documentnumber credentials already exists in database
+                if (resultset.getString("bsn") != null) { 
+                    bsnField.setValue(resultset.getString("bsn")); 
+                } else { 
+                    bsnField.setValue(""); 
+                }
+                if (resultset.getString("documentnumber") != null) { 
+                    documentnumberField.setValue(resultset.getString("documentnumber")); 
+                }
+                else { 
+                    documentnumberField.setValue(""); 
+                }
             } 
             connection.close();
         } catch(SQLException e) {
@@ -206,13 +215,22 @@ public class Profile extends VerticalLayout {
     // Update personal details in database
     private void updateProfileDetails(String username) {
         // Check if fields are not empty
-        if (firstnameField.isEmpty()|| lastnameField.isEmpty() || birthdateField.isEmpty() || bsnField.isEmpty() || documentnumberField.isEmpty() || addressField.isEmpty() || zipField.isEmpty() || cityField.isEmpty() || countrycodeField.isEmpty() || phonenumberField.isEmpty() || emailField.isEmpty()) {
+        if (firstnameField.isEmpty()|| lastnameField.isEmpty() || birthdateField.isEmpty() || bsnField.isEmpty() || 
+            documentnumberField.isEmpty() || addressField.isEmpty() || zipField.isEmpty() || cityField.isEmpty() || 
+            countrycodeField.isEmpty() || phonenumberField.isEmpty() || emailField.isEmpty() || bsnField.isEmpty() 
+            || documentnumberField.isEmpty()) {
+            
             errorMessage.setText("Fill in all fields");
         } else {
             if (specialFieldCheck()) {
                 try {
                     Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
-                    String sql = "UPDATE customers SET givenname='"+firstnameField.getValue()+"', familyname='"+lastnameField.getValue()+"', birthdate='"+birthdateField.getValue()+"', address='"+addressField.getValue()+"', zip='"+zipField.getValue()+"', city='"+cityField.getValue()+"', countrycode='"+countrycodeField.getValue()+"', phonenumber='"+phonenumberField.getValue()+"', emailaddress='"+emailField.getValue()+"', bsn='"+bsnField.getValue()+"', documentnumber='"+documentnumberField.getValue()+"' WHERE username='"+username+"'";
+                    String sql = "UPDATE customers SET givenname='"+firstnameField.getValue()+"', familyname='"+
+                        lastnameField.getValue()+"', birthdate='"+birthdateField.getValue()+"', address='"+
+                        addressField.getValue()+"', zip='"+zipField.getValue()+"', city='"+cityField.getValue()+
+                        "', countrycode='"+countrycodeField.getValue()+"', phonenumber='"+phonenumberField.getValue()+
+                        "', emailaddress='"+emailField.getValue()+"', bsn='"+bsnField.getValue()+"', documentnumber='"+
+                        documentnumberField.getValue()+"' WHERE username='"+username+"'";
                     Statement statement = connection.createStatement();
                     statement.executeUpdate(sql);
                     errorMessage.setText("");
@@ -233,6 +251,7 @@ public class Profile extends VerticalLayout {
         boolean validEmail=false;
         LocalDate birthdate = LocalDate.parse("" + birthdateField.getValue());
 
+        // Check if user is not younger than today and at least 21 years old
         if (birthdate.isAfter(today)) {
             errorMessage.setText("Enter a valid age");
             validAge = false;
@@ -243,6 +262,7 @@ public class Profile extends VerticalLayout {
             validAge = true;
         }
 
+        // Check if phonenumber is valid
         if (phonenumberField.getValue().matches("^[0-9]{10}$")) {
             validPhonenumber=true;
         } else {
@@ -250,6 +270,7 @@ public class Profile extends VerticalLayout {
             errorMessage.setText("Enter a valid phonenumber");
         }
 
+        // Check if email is valid
         if (emailField.getValue().matches("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}")) {
             validEmail=true;
         } else {
@@ -257,12 +278,12 @@ public class Profile extends VerticalLayout {
             errorMessage.setText("Enter a valid email");
         } 
 
+        // If all credentials are valid, return true
         if (validAge && validPhonenumber && validEmail) {
             return true;
         } else {
             return false;
-        }
-        
+        }    
     }
 
     // HEADER
@@ -312,9 +333,9 @@ public class Profile extends VerticalLayout {
         } else {
             MenuItem menuItemReservations = subMenuLogin.addItem("Reservations");
             menuItemReservations.addClickListener(e -> menuItemReservations.getUI().ifPresent(ui -> ui.navigate("ProfileReservations")));
-            MenuItem menuItemRegister = subMenuLogin.addItem("Logout");
-            menuItemRegister.addClickListener(e -> SessionAttributes.logout());
-            menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Login")));
+            MenuItem menuItemLogout = subMenuLogin.addItem("Logout");
+            menuItemLogout.addClickListener(e -> SessionAttributes.logout());
+            menuItemLogout.addClickListener(e -> menuItemLogout.getUI().ifPresent(ui -> ui.navigate("Login")));
         }
         add(header, menuBar);
     }

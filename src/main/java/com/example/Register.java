@@ -56,6 +56,7 @@ public class Register extends VerticalLayout {
     private PasswordField passwordField2 = new PasswordField("Password check");
 
     public Register() {
+        // Check if the user is not logged in
         if (SessionAttributes.getLoggedIn() == null || SessionAttributes.getLoggedIn() == "false") {
             setDefaultHorizontalComponentAlignment(Alignment.CENTER);
             setSizeFull();
@@ -89,10 +90,13 @@ public class Register extends VerticalLayout {
             registerButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             
             // Create formlayout for register form
-            FormLayout layout = new FormLayout(pageName, firstnameField, lastnameField, bsnField, documentnumberField, birthdateField, addressField, zipField, cityField, countrycodeField, phonenumberField, emailField, usernameField, passwordField1, passwordField2, errorMessage, registerButton);
+            FormLayout layout = new FormLayout(pageName, firstnameField, lastnameField, bsnField, documentnumberField, birthdateField, 
+                addressField, zipField, cityField, countrycodeField, phonenumberField, emailField, usernameField, passwordField1, 
+                passwordField2, errorMessage, registerButton);
             layout.setMaxWidth("500px");
             layout.getStyle().set("margin","0 auto");
-            layout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP), new FormLayout.ResponsiveStep("490px", 2, FormLayout.ResponsiveStep.LabelsPosition.TOP));
+            layout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP), 
+                new FormLayout.ResponsiveStep("490px", 2, FormLayout.ResponsiveStep.LabelsPosition.TOP));
             layout.setColspan(pageName, 2);
 
             layout.setColspan(errorMessage, 2);
@@ -101,14 +105,20 @@ public class Register extends VerticalLayout {
             errorMessage.getStyle().set("color", "var(--lumo-error-text-color)");
             errorMessage.getStyle().set("padding", "15px 0");
             add(layout);
-            registerButton.addClickListener(event -> checkCredentials(errorMessage, firstnameField.getValue(), lastnameField.getValue(), bsnField.getValue(), documentnumberField.getValue(), addressField.getValue(), birthdateField.getValue(), zipField.getValue(), cityField.getValue(), countrycodeField.getValue(), emailField.getValue(), phonenumberField.getValue(), usernameField.getValue(), passwordField1.getValue(), passwordField2.getValue()));
+            registerButton.addClickListener(event -> checkCredentials(errorMessage, firstnameField.getValue(), lastnameField.getValue(), 
+                bsnField.getValue(), documentnumberField.getValue(), addressField.getValue(), birthdateField.getValue(), 
+                zipField.getValue(), cityField.getValue(), countrycodeField.getValue(), emailField.getValue(), phonenumberField.getValue(), 
+                usernameField.getValue(), passwordField1.getValue(), passwordField2.getValue()));
         } else {
             UI.getCurrent().navigate("");
             UI.getCurrent().getPage().reload();
         }
     }
     // Check given credentials
-    private void checkCredentials(Span error, String firstname, String lastname, String bsn, String documentnumber, String address, LocalDate birthdate, String zip, String city, String countrycode, String email, String phonenumber, String username, String password1, String password2) {
+    private void checkCredentials(Span error, String firstname, String lastname, String bsn, String documentnumber, String address, 
+        LocalDate birthdate, String zip, String city, String countrycode, String email, String phonenumber, String username, 
+        String password1, String password2) {
+        
         boolean validAge = false;
         boolean validUsername = false;
         boolean validPasswords = false;
@@ -116,8 +126,11 @@ public class Register extends VerticalLayout {
         boolean validEmail = false;
 
         // Check if all fields are filled in
-        if (firstnameField.isEmpty() || lastnameField.isEmpty() || bsnField.isEmpty() || documentnumberField.isEmpty() || addressField.isEmpty() || birthdateField.isEmpty() || zipField.isEmpty() || cityField.isEmpty() || countrycodeField.isEmpty() || email.isEmpty() || phonenumber.isEmpty() || username.isEmpty() || password1.isEmpty() || password2.isEmpty()) {
-            error.setText("Fill in all fields!");
+        if (firstnameField.isEmpty() || lastnameField.isEmpty() || bsnField.isEmpty() || documentnumberField.isEmpty() || 
+            addressField.isEmpty() || birthdateField.isEmpty() || zipField.isEmpty() || cityField.isEmpty() || countrycodeField.isEmpty() || 
+            email.isEmpty() || phonenumber.isEmpty() || username.isEmpty() || password1.isEmpty() || password2.isEmpty()) {
+            
+                error.setText("Fill in all fields!");
         } else {
             // Check if user is not younger than today and at least 21 years old
             if (birthdate.isAfter(today)) {
@@ -143,6 +156,7 @@ public class Register extends VerticalLayout {
                 validPasswords = false;
                 error.setText("Passwords do not match");
             }  
+
             // Check if email is valid
             if (email.matches("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}")) {
                 validEmail = true;
@@ -150,6 +164,7 @@ public class Register extends VerticalLayout {
                 validEmail = false;
                 error.setText("Invalid email");
             }
+
             // Check if phonenumber is valid
             if (phonenumber.matches("^[0-9]{10}$")) {
                 validPhonenumber = true;
@@ -188,10 +203,15 @@ public class Register extends VerticalLayout {
     }
 
     // Connect to database and create new user
-    private void register(String firstname, String lastname, String bsn, String documentnumber, String address, LocalDate birthdate, String zip, String city, String countrycode, String email, String phonenumber, String username, String password1) {       
+    private void register(String firstname, String lastname, String bsn, String documentnumber, String address, LocalDate birthdate, 
+        String zip, String city, String countrycode, String email, String phonenumber, String username, String password1) {   
+                
         try {
             Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
-            String sql = "INSERT INTO customers (username, password, givenname, familyname, countrycode, city, address, zip, phonenumber, emailaddress, birthdate, bsn, documentnumber) VALUES ('"+username+"', '"+password1+"', '"+firstname+"', '"+lastname+"', '"+countrycode+"', '"+city+"', '"+address+"', '"+zip+"', '"+phonenumber+"', '"+email+"', '"+birthdate+"', '"+bsn+"', '"+documentnumber+"')";
+            String sql = "INSERT INTO customers (username, password, givenname, familyname, countrycode, city, address, zip,"
+                +" phonenumber, emailaddress, birthdate, bsn, documentnumber) VALUES ('"+username+"', '"+password1+"', '"+firstname
+                +"', '"+lastname+"', '"+countrycode+"', '"+city+"', '"+address+"', '"+zip+"', '"+phonenumber+"', '"+email+"', '"
+                +birthdate+"', '"+bsn+"', '"+documentnumber+"')";
             Statement statement = connection.createStatement();
             statement.executeUpdate(sql);
             connection.close();
@@ -246,9 +266,11 @@ public class Register extends VerticalLayout {
             MenuItem menuItemRegister = subMenuLogin.addItem("Register");
             menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
         } else {
-            MenuItem menuItemRegister = subMenuLogin.addItem("Logout");
-            menuItemRegister.addClickListener(e -> SessionAttributes.logout());
-            menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Login")));
+            MenuItem menuItemReservations = subMenuLogin.addItem("Reservations");
+            menuItemReservations.addClickListener(e -> menuItemReservations.getUI().ifPresent(ui -> ui.navigate("ProfileReservations")));
+            MenuItem menuItemLogout = subMenuLogin.addItem("Logout");
+            menuItemLogout.addClickListener(e -> SessionAttributes.logout());
+            menuItemLogout.addClickListener(e -> menuItemLogout.getUI().ifPresent(ui -> ui.navigate("Login")));
         }
         add(header, menuBar);
     }

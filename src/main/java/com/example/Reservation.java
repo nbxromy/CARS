@@ -3,6 +3,9 @@ package com.example;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+/* 
+    Class to store and retrieve reservation credentials
+*/
 public class Reservation {
     private String orderID;
     private String carName;
@@ -22,7 +25,10 @@ public class Reservation {
     private String extraDriver;
     private String childSeat;
 
-    public Reservation(String orderID, String carName, String licencePlate, String username, String location, LocalDate pickupDate, LocalTime pickupTime, LocalDate dropoffDate, LocalTime dropoffTime, String price, String isPaid, String gps, String insurance, String winterTires, String extraDriver, String childSeat) {
+    public Reservation(String orderID, String carName, String licencePlate, String username, String location, LocalDate pickupDate, 
+        LocalTime pickupTime, LocalDate dropoffDate, LocalTime dropoffTime, String price, String isPaid, String gps, String insurance, 
+        String winterTires, String extraDriver, String childSeat) {
+
         this.orderID = orderID;
         this.carName = carName;
         this.licencePlate = licencePlate;

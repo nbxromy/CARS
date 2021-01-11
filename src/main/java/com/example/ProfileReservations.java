@@ -51,6 +51,7 @@ public class ProfileReservations extends VerticalLayout {
 
     // Profile of the logged in user 
     public ProfileReservations() {
+        // Check if the user is logged in
         if (SessionAttributes.getLoggedIn() != null && SessionAttributes.getLoggedIn() == "true") {
             setDefaultHorizontalComponentAlignment(Alignment.CENTER);
             setSizeFull();
@@ -64,6 +65,7 @@ public class ProfileReservations extends VerticalLayout {
             H3 reservationSectionName = new H3("Your reservations");
             add(reservationSectionName);
 
+            // Check if reservation exists
             if (!hasAnyReservations) {
                 Span message = new Span();
                 message.getStyle().set("color", "var(--lumo-primary-text-color)");
@@ -76,6 +78,7 @@ public class ProfileReservations extends VerticalLayout {
 
                 add(message, redirectButton);
             } else {
+                // Show grid with reservations
                 getReservations();
             }
         } else {
@@ -113,7 +116,13 @@ public class ProfileReservations extends VerticalLayout {
             Statement statement = connection.createStatement();
             ResultSet resultset = statement.executeQuery(sql);
             while (resultset.next()) {
-                reservationList.add(new Reservation(resultset.getString("orderid"), resultset.getString("carname"), resultset.getString("licenceplate"), resultset.getString("username"), resultset.getString("location"), LocalDate.parse(resultset.getString("pickupdate")), LocalTime.parse(resultset.getString("pickuptime")), LocalDate.parse(resultset.getString("dropoffdate")), LocalTime.parse(resultset.getString("dropofftime")), "€"+resultset.getString("price")+",00", resultset.getString("ispaid"), resultset.getString("gps"), resultset.getString("insurance"), resultset.getString("wintertires"), resultset.getString("extradriver"), resultset.getString("childseat")));
+                reservationList.add(new Reservation(resultset.getString("orderid"), resultset.getString("carname"),
+                    resultset.getString("licenceplate"), resultset.getString("username"), resultset.getString("location"), 
+                    LocalDate.parse(resultset.getString("pickupdate")), LocalTime.parse(resultset.getString("pickuptime")), 
+                    LocalDate.parse(resultset.getString("dropoffdate")), LocalTime.parse(resultset.getString("dropofftime")), 
+                    "€"+resultset.getString("price")+",00", resultset.getString("ispaid"), resultset.getString("gps"), 
+                    resultset.getString("insurance"), resultset.getString("wintertires"), resultset.getString("extradriver"), 
+                    resultset.getString("childseat")));
             } 
             connection.close();
         } catch(SQLException e) {
@@ -125,15 +134,18 @@ public class ProfileReservations extends VerticalLayout {
         Grid<Reservation> reservationGrid = new Grid<>(Reservation.class);
         reservationGrid.setItems(reservationList);
         reservationGrid.setMultiSort(false);
-        reservationGrid.setColumns("orderID", "carName", "licencePlate", "price", "isPaid", "location", "pickupDate", "pickupTime", "dropoffDate", "dropoffTime");
+        reservationGrid.setColumns("orderID", "carName", "licencePlate", "price", "isPaid", "location", "pickupDate",
+            "pickupTime", "dropoffDate", "dropoffTime");
 
         reservationGrid.setSelectionMode(SelectionMode.SINGLE);
         add(reservationGrid);   
 
+        // Error message
         Span errorMessage = new Span();
         errorMessage.getStyle().set("color", "var(--lumo-error-text-color)");
         errorMessage.getStyle().set("padding", "15px 0");
 
+        // Text field for the reservation you want to cancel
         TextField orderIdField = new TextField("Enter your order ID which you want to delete");
         orderIdField.getStyle().set("width", "500px");
         Button cancelButton = new Button("Cancel reservation");
@@ -141,12 +153,15 @@ public class ProfileReservations extends VerticalLayout {
         // Cancel reservation checks
         cancelButton.addClickListener(e -> {
             boolean checkExists = checkReservation(orderIdField.getValue());
+            // Check if reservation exists
             if (!checkExists) {
                 errorMessage.setText("No reservation found");
             } else {
                 boolean checkDate = verificateReservation(orderIdField.getValue());
+                // Check if pick up date is not in 48 hours from now on
                 if (!checkDate) {
-                    errorMessage.setText("You can't cancel a reservation in 48 hours before pickup, please contact your local Qars location");
+                    errorMessage.setText("You can't cancel a reservation in 48 hours before pickup, please contact"+
+                        " your local Qars location");
                 } else {
                     cancelReservation(orderIdField.getValue());
                 }
@@ -159,7 +174,8 @@ public class ProfileReservations extends VerticalLayout {
     private boolean checkReservation(String orderID) {
         try {
             Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
-            String sql = "SELECT * FROM reservations WHERE username='"+SessionAttributes.getLoggedUser()+"' AND orderid='"+orderID+"'";
+            String sql = "SELECT * FROM reservations WHERE username='"+SessionAttributes.getLoggedUser()+
+                "' AND orderid='"+orderID+"'";
             Statement statement = connection.createStatement();
             ResultSet resultset = statement.executeQuery(sql);
             if (resultset.next()) {
@@ -178,11 +194,14 @@ public class ProfileReservations extends VerticalLayout {
     private boolean verificateReservation(String orderID) {
         try {
             Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
-            String sql = "SELECT * FROM reservations WHERE username='"+SessionAttributes.getLoggedUser()+"' AND orderid='"+orderID+"'";
+            String sql = "SELECT * FROM reservations WHERE username='"+SessionAttributes.getLoggedUser()+
+                "' AND orderid='"+orderID+"'";
             Statement statement = connection.createStatement();
             ResultSet resultset = statement.executeQuery(sql);
             if (resultset.next()) {
-                LocalDateTime pickupDateTime = LocalDateTime.of(LocalDate.parse(resultset.getString("pickupdate")), LocalTime.parse(resultset.getString("pickuptime")));
+                LocalDateTime pickupDateTime = LocalDateTime.of(LocalDate.parse(resultset.getString("pickupdate")),
+                    LocalTime.parse(resultset.getString("pickuptime")));
+
                 if (pickupDateTime.isBefore(today.plusHours(48))) {
                     return false;
                 } else {
@@ -202,7 +221,8 @@ public class ProfileReservations extends VerticalLayout {
     private void cancelReservation(String orderID) {
         try {
             Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
-            String sql = "DELETE FROM reservations WHERE username='"+SessionAttributes.getLoggedUser()+"' AND orderid='"+orderID+"'";
+            String sql = "DELETE FROM reservations WHERE username='"+SessionAttributes.getLoggedUser()+
+                "' AND orderid='"+orderID+"'";
             Statement statement = connection.createStatement();
             statement.executeUpdate(sql);
             connection.close();
@@ -261,9 +281,9 @@ public class ProfileReservations extends VerticalLayout {
         } else {
             MenuItem menuItemReservations = subMenuLogin.addItem("Reservations");
             menuItemReservations.addClickListener(e -> menuItemReservations.getUI().ifPresent(ui -> ui.navigate("ProfileReservations")));
-            MenuItem menuItemRegister = subMenuLogin.addItem("Logout");
-            menuItemRegister.addClickListener(e -> SessionAttributes.logout());
-            menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Login")));
+            MenuItem menuItemLogout = subMenuLogin.addItem("Logout");
+            menuItemLogout.addClickListener(e -> SessionAttributes.logout());
+            menuItemLogout.addClickListener(e -> menuItemLogout.getUI().ifPresent(ui -> ui.navigate("Login")));
         }
         add(header, menuBar);
     }

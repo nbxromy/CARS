@@ -1,7 +1,7 @@
 package com.example;
 import com.vaadin.flow.server.VaadinService;
 
-// Class to manage login sessions
+// Class to manage vaadin sessions
 public class SessionAttributes {
 
     // Function to login user using HttpSession
