@@ -82,6 +82,19 @@ public class SessionAttributes {
         }
     }
 
+    // Function to search on location
+    public static void setSearchLocation(String locationSearchValue) {
+        VaadinService.getCurrentRequest().getWrappedSession().setAttribute("locationSearchValue", locationSearchValue);
+    }
+
+    // Return searched location
+    public static String getSearchLocation() {
+        if (VaadinService.getCurrentRequest().getWrappedSession().getAttribute("locationSearchValue") == null) {
+            return null;
+        } else {
+            return VaadinService.getCurrentRequest().getWrappedSession().getAttribute("locationSearchValue").toString();
+        }
+    }
 
     // Function to login employees
     public static void employeeLogin(String employeeUser){

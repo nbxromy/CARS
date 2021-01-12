@@ -40,9 +40,9 @@ public class ProfileReservations extends VerticalLayout {
     private static final long serialVersionUID = 1L;
     
     // Database credentials
-    private String jdbcURL = "jdbc:postgresql://localhost:5432/ProjectC";
+    private String jdbcURL = "jdbc:postgresql://localhost:5432/Test_Project";
     private String jdbcUsername = "postgres";
-    private String jdbcPassword = "asdf";
+    private String jdbcPassword = "asd";
 
     private LocalDateTime today = LocalDateTime.now();
 
@@ -281,6 +281,36 @@ public class ProfileReservations extends VerticalLayout {
             MenuItem menuItemLogout = subMenuLogin.addItem("Logout");
             menuItemLogout.addClickListener(e -> SessionAttributes.logout());
             menuItemLogout.addClickListener(e -> menuItemLogout.getUI().ifPresent(ui -> ui.navigate("Login")));
+        }
+
+        // If neither admin or employee or another user is logged in, show employee login menu.
+        if((SessionAttributes.getEmployeeLogin()=="false" || SessionAttributes.getEmployeeLogin() == null)&& (SessionAttributes.getAdminLogin()=="false" || SessionAttributes.getAdminLogin()== null) && (SessionAttributes.getLoggedIn()=="false") || SessionAttributes.getLoggedIn()==null){
+            MenuItem menuItemEmployeeLogin = subMenuLogin.addItem("Employee login");
+            menuItemEmployeeLogin.addClickListener(e -> menuItemEmployeeLogin.getUI().ifPresent(ui -> ui.navigate("employeeLogin")));
+        }
+        // If employee is logged in, show employee menu
+        MenuItem menuItemEmployee;
+        if(SessionAttributes.getEmployeeLogin() =="true"){
+            menuItemEmployee = menuBar.addItem("Employee");
+            menuItemEmployee.addClickListener(e -> menuItemEmployee.getUI().ifPresent(ui -> ui.navigate("Employee")));
+            MenuItem menuItemEmployeeLogin = subMenuLogin.addItem("Employee log out");
+            menuItemEmployeeLogin.addClickListener(e -> SessionAttributes.employeeLogout());
+            menuItemEmployeeLogin.addClickListener(e -> menuItemEmployeeLogin.getUI().ifPresent(ui -> ui.navigate("FAQ")));
+        }
+        // If admin is logged in, show admin menu
+        MenuItem menuItemAdmin;
+        if(SessionAttributes.getAdminLogin()=="true"){
+            menuItemAdmin = menuBar.addItem("Admin");
+            menuItemAdmin.addClickListener(e -> menuItemAdmin.getUI().ifPresent(ui -> ui.navigate("Admin")));
+            
+            SubMenu subMenuAdmin = menuItemAdmin.getSubMenu();
+            MenuItem menuItemActiveBookings = subMenuAdmin.addItem("Active bookings");
+            menuItemActiveBookings.addClickListener(e -> menuItemAdmin.getUI().ifPresent(ui -> ui.navigate("activeBookings")));
+            MenuItem menuItemFinishedBookings = subMenuAdmin.addItem("Finished bookings");
+            menuItemFinishedBookings.addClickListener(e -> menuItemAdmin.getUI().ifPresent(ui -> ui.navigate("finishedBookings")));
+            MenuItem menuItemAdminLogin = subMenuLogin.addItem("Admin logout");
+            menuItemAdminLogin.addClickListener(e -> SessionAttributes.adminLogout());
+            menuItemAdminLogin.addClickListener(e -> menuItemAdminLogin.getUI().ifPresent(ui -> ui.navigate("FAQ")));
         }
         add(header, menuBar);
     }

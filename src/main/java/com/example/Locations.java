@@ -1,15 +1,19 @@
-
 package com.example;
 
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.formlayout.FormLayout;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
@@ -18,13 +22,12 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.polymertemplate.Id;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
-
-
 
 @Route(value="Locations")
 @PageTitle("Locations")
@@ -55,24 +58,53 @@ public class Locations extends VerticalLayout {
     public Locations() {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         setSizeFull();
-        //addClassName("cv, grid");
         addHeader();
-        getLocations();
+
+        H2 pageName = new H2("Locations");
+
+        // Form layout to search locations
+        FormLayout searchLayout = new FormLayout();
+        TextField searchField = new TextField("Search on country code"); 
+
+        // Button to search on locations
+        Button searchButton = new Button("Search");
+        searchButton.addClickListener(e -> {
+            SessionAttributes.setSearchLocation(searchField.getValue().toUpperCase());
+            UI.getCurrent().getPage().reload(); 
+        });
+
+        // Button to see all locations
+        Button resetButton = new Button("Get all results");
+        resetButton.addClickListener(e -> {
+            SessionAttributes.setSearchLocation("");
+            UI.getCurrent().getPage().reload(); 
+        });
         
-        // Import data out of postgreSQL
-        H2 pageName = new H2("Add link here .. (to database)");
-        add(pageName);
+        // Check if a location is searched or not
+        if (SessionAttributes.getSearchLocation() == null || SessionAttributes.getSearchLocation() == "") {
+            // Show all locations
+            getLocations();
+        } else {
+            // Show filtered locations
+            getFilteredLocations(SessionAttributes.getSearchLocation());
+            pageName = new H2("Locations - " + SessionAttributes.getSearchLocation());
+        }
+
+        // Add everything to page
+        searchLayout.add(searchField, searchButton, resetButton);
+        searchLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP), 
+            new FormLayout.ResponsiveStep("490px", 3, FormLayout.ResponsiveStep.LabelsPosition.TOP));
+        add(pageName, searchLayout);
 
         // Table (grid) for the 3 values
         grid = new Grid<>(Locations.class, false);
         grid.setItems(locationlist);
         grid.removeAllColumns();
-        grid.addColumn(Locations::getCountryCode).setHeader("Countrycode");
+        grid.addColumn(Locations::getCountryCode).setHeader("Address");
         grid.addColumn(Locations::getCity).setHeader("City");
-        grid.addColumn(Locations::getAddress).setHeader("Address");
+        grid.addColumn(Locations::getAddress).setHeader("Country code");
         grid.setHeightFull();
         add(grid);
-
     }
 
     public Locations(String countrycode, String city, String address){
@@ -81,26 +113,52 @@ public class Locations extends VerticalLayout {
         City = city;
         Address = address;
     }
+
+    // Function to get all locations
     public void getLocations(){
         try{
-
-            Connection conn = DriverManager.getConnection(jdbcURL,jdbcUsername,jdbcPassword);
-            PreparedStatement checkUsnEmail = conn.prepareStatement("SELECT * FROM \"locations\"");
-            ResultSet rs = checkUsnEmail.executeQuery();
-            while(rs.next()){
-                String countrycode = rs.getString(1);
-                String city= rs.getString(2);
-                String address = rs.getString(3);
+            Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
+            String sql = "SELECT * FROM locations";
+            Statement statement = connection.createStatement();
+            ResultSet resultset = statement.executeQuery(sql);
+            while(resultset.next()){
+                String address = resultset.getString(5);
+                String city= resultset.getString(4);
+                String countrycode = resultset.getString(3);
                 
-                
-                locationlist.add(new Locations(countrycode,city,address));
+                locationlist.add(new Locations(address,city,countrycode));
             }
-            conn.close();
+            connection.close();
         }
         catch(Exception e){
             
         }
     }
+    
+    // Function to get all filtered locations
+    public void getFilteredLocations(String checkcode){
+        try {
+            Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
+            String sql = "SELECT * FROM locations WHERE countrycode='"+checkcode+"'";
+            Statement statement = connection.createStatement();
+            ResultSet resultset = statement.executeQuery(sql);
+            if (resultset.next()) {
+                while(resultset.next()){
+                    String address = resultset.getString(5);
+                    String city= resultset.getString(4);
+                    String countrycode = resultset.getString(3);
+                
+                    locationlist.add(new Locations(address,city,countrycode));
+                }
+            } else {
+                Notification.show("No results found");
+            }
+            connection.close();
+        } catch(SQLException e) {
+   
+        } 
+    }
+
     public String getCountryCode() {
         return countryCode;
     }
@@ -110,7 +168,7 @@ public class Locations extends VerticalLayout {
     public String getAddress() {
         return Address;
     }
-    // Header, menu bar
+    // HEADER
     public void addHeader() {
         // Header
         H1 header = new H1("QARS");
@@ -132,9 +190,18 @@ public class Locations extends VerticalLayout {
         menuItemFaq.addClickListener(e -> menuItemFaq.getUI().ifPresent(ui -> ui.navigate("FAQ")));
         MenuItem menuItemCorona = menuBar.addItem("COVID-19");
         menuItemCorona.addClickListener(e -> menuItemCorona.getUI().ifPresent(ui -> ui.navigate("Corona")));
-        MenuItem menuItemLogin = menuBar.addItem("Login");
-        menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
-        menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Login")));
+        MenuItem menuItemReview = menuBar.addItem("Reviews");
+        menuItemReview.addClickListener(e -> menuItemReview.getUI().ifPresent(ui -> ui.navigate("Reviews")));
+        MenuItem menuItemLogin;
+        if (SessionAttributes.getLoggedIn() == null || SessionAttributes.getLoggedIn() == "false") {
+            menuItemLogin = menuBar.addItem("Login");
+            menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
+            menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Login")));
+        } else {
+            menuItemLogin = menuBar.addItem("Profile");
+            menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
+            menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Profile")));
+        }
 
         // Menu bar - Sub menu's 
         SubMenu subMenuRent = menuItemRent.getSubMenu();
@@ -142,8 +209,46 @@ public class Locations extends VerticalLayout {
         menuItemRentInformation.addClickListener(e -> menuItemRentInformation.getUI().ifPresent(ui -> ui.navigate("Information")));
         
         SubMenu subMenuLogin = menuItemLogin.getSubMenu();
-        MenuItem menuItemRegister = subMenuLogin.addItem("Register");
-        menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
+        if (SessionAttributes.getLoggedIn() == null || SessionAttributes.getLoggedIn() == "false") {
+            MenuItem menuItemRegister = subMenuLogin.addItem("Register");
+            menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
+        } else {
+            MenuItem menuItemReservations = subMenuLogin.addItem("Reservations");
+            menuItemReservations.addClickListener(e -> menuItemReservations.getUI().ifPresent(ui -> ui.navigate("ProfileReservations")));
+            MenuItem menuItemLogout = subMenuLogin.addItem("Logout");
+            menuItemLogout.addClickListener(e -> SessionAttributes.logout());
+            menuItemLogout.addClickListener(e -> menuItemLogout.getUI().ifPresent(ui -> ui.navigate("Login")));
+        }
+
+        // If neither admin or employee or another user is logged in, show employee login menu.
+        if((SessionAttributes.getEmployeeLogin()=="false" || SessionAttributes.getEmployeeLogin() == null)&& (SessionAttributes.getAdminLogin()=="false" || SessionAttributes.getAdminLogin()== null) && (SessionAttributes.getLoggedIn()=="false") || SessionAttributes.getLoggedIn()==null){
+            MenuItem menuItemEmployeeLogin = subMenuLogin.addItem("Employee login");
+            menuItemEmployeeLogin.addClickListener(e -> menuItemEmployeeLogin.getUI().ifPresent(ui -> ui.navigate("employeeLogin")));
+        }
+        // If employee is logged in, show employee menu
+        MenuItem menuItemEmployee;
+        if(SessionAttributes.getEmployeeLogin() =="true"){
+            menuItemEmployee = menuBar.addItem("Employee");
+            menuItemEmployee.addClickListener(e -> menuItemEmployee.getUI().ifPresent(ui -> ui.navigate("Employee")));
+            MenuItem menuItemEmployeeLogin = subMenuLogin.addItem("Employee log out");
+            menuItemEmployeeLogin.addClickListener(e -> SessionAttributes.employeeLogout());
+            menuItemEmployeeLogin.addClickListener(e -> menuItemEmployeeLogin.getUI().ifPresent(ui -> ui.navigate("FAQ")));
+        }
+        // If admin is logged in, show admin menu
+        MenuItem menuItemAdmin;
+        if(SessionAttributes.getAdminLogin()=="true"){
+            menuItemAdmin = menuBar.addItem("Admin");
+            menuItemAdmin.addClickListener(e -> menuItemAdmin.getUI().ifPresent(ui -> ui.navigate("Admin")));
+            
+            SubMenu subMenuAdmin = menuItemAdmin.getSubMenu();
+            MenuItem menuItemActiveBookings = subMenuAdmin.addItem("Active bookings");
+            menuItemActiveBookings.addClickListener(e -> menuItemAdmin.getUI().ifPresent(ui -> ui.navigate("activeBookings")));
+            MenuItem menuItemFinishedBookings = subMenuAdmin.addItem("Finished bookings");
+            menuItemFinishedBookings.addClickListener(e -> menuItemAdmin.getUI().ifPresent(ui -> ui.navigate("finishedBookings")));
+            MenuItem menuItemAdminLogin = subMenuLogin.addItem("Admin logout");
+            menuItemAdminLogin.addClickListener(e -> SessionAttributes.adminLogout());
+            menuItemAdminLogin.addClickListener(e -> menuItemAdminLogin.getUI().ifPresent(ui -> ui.navigate("FAQ")));
+        }
         add(header, menuBar);
-    }    
+    }   
 }

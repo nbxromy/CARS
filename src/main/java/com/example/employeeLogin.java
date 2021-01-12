@@ -26,9 +26,9 @@ import com.vaadin.flow.router.Route;
 public class employeeLogin extends VerticalLayout{
  
     private static final long serialVersionUID = 1L;
-    String jdbcURL = "jdbc:postgresql://localhost:5432/Test_Project";
-    String jdbcusername = "postgres";
-    String jdbcpassword = "asd";
+    private String jdbcURL = "jdbc:postgresql://localhost:5432/Test_Project";
+    private String jdbcusername = "postgres";
+    private String jdbcpassword = "asd";
     public boolean adminLoggedin;
     public boolean employeeLoggedin;
     public int EmployeeOrAdmin;
@@ -147,6 +147,7 @@ public class employeeLogin extends VerticalLayout{
     public int getEmployeeOrAdmin(){
         return EmployeeOrAdmin;
     }
+    // HEADER
     public void addHeader() {
         // Header
         H1 header = new H1("QARS");
@@ -181,8 +182,6 @@ public class employeeLogin extends VerticalLayout{
             menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Profile")));
         }
 
-        
-
         // Menu bar - Sub menu's 
         SubMenu subMenuRent = menuItemRent.getSubMenu();
         MenuItem menuItemRentInformation = subMenuRent.addItem("Information");
@@ -193,12 +192,15 @@ public class employeeLogin extends VerticalLayout{
             MenuItem menuItemRegister = subMenuLogin.addItem("Register");
             menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
         } else {
-            MenuItem menuItemRegister = subMenuLogin.addItem("Logout");
-            menuItemRegister.addClickListener(e -> SessionAttributes.logout());
-            menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Login")));
+            MenuItem menuItemReservations = subMenuLogin.addItem("Reservations");
+            menuItemReservations.addClickListener(e -> menuItemReservations.getUI().ifPresent(ui -> ui.navigate("ProfileReservations")));
+            MenuItem menuItemLogout = subMenuLogin.addItem("Logout");
+            menuItemLogout.addClickListener(e -> SessionAttributes.logout());
+            menuItemLogout.addClickListener(e -> menuItemLogout.getUI().ifPresent(ui -> ui.navigate("Login")));
         }
-        // If neither admin or employee is logged in, show employee login menu.
-        if((SessionAttributes.getEmployeeLogin()=="false" || SessionAttributes.getEmployeeLogin() == null)&& (SessionAttributes.getAdminLogin()=="false" || SessionAttributes.getAdminLogin()== null)){
+
+        // If neither admin or employee or another user is logged in, show employee login menu.
+        if((SessionAttributes.getEmployeeLogin()=="false" || SessionAttributes.getEmployeeLogin() == null)&& (SessionAttributes.getAdminLogin()=="false" || SessionAttributes.getAdminLogin()== null) && (SessionAttributes.getLoggedIn()=="false") || SessionAttributes.getLoggedIn()==null){
             MenuItem menuItemEmployeeLogin = subMenuLogin.addItem("Employee login");
             menuItemEmployeeLogin.addClickListener(e -> menuItemEmployeeLogin.getUI().ifPresent(ui -> ui.navigate("employeeLogin")));
         }
@@ -226,7 +228,6 @@ public class employeeLogin extends VerticalLayout{
             menuItemAdminLogin.addClickListener(e -> SessionAttributes.adminLogout());
             menuItemAdminLogin.addClickListener(e -> menuItemAdminLogin.getUI().ifPresent(ui -> ui.navigate("FAQ")));
         }
-        
         add(header, menuBar);
     }
 }

@@ -224,7 +224,7 @@ public class Reviews extends VerticalLayout {
         }
     }
 
-    // Header, menu bar
+    // HEADER
     public void addHeader() {
         // Header
         H1 header = new H1("QARS");
@@ -246,9 +246,18 @@ public class Reviews extends VerticalLayout {
         menuItemFaq.addClickListener(e -> menuItemFaq.getUI().ifPresent(ui -> ui.navigate("FAQ")));
         MenuItem menuItemCorona = menuBar.addItem("COVID-19");
         menuItemCorona.addClickListener(e -> menuItemCorona.getUI().ifPresent(ui -> ui.navigate("Corona")));
-        MenuItem menuItemLogin = menuBar.addItem("Login");
-        menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
-        menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Login")));
+        MenuItem menuItemReview = menuBar.addItem("Reviews");
+        menuItemReview.addClickListener(e -> menuItemReview.getUI().ifPresent(ui -> ui.navigate("Reviews")));
+        MenuItem menuItemLogin;
+        if (SessionAttributes.getLoggedIn() == null || SessionAttributes.getLoggedIn() == "false") {
+            menuItemLogin = menuBar.addItem("Login");
+            menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
+            menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Login")));
+        } else {
+            menuItemLogin = menuBar.addItem("Profile");
+            menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
+            menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Profile")));
+        }
 
         // Menu bar - Sub menu's 
         SubMenu subMenuRent = menuItemRent.getSubMenu();
@@ -256,11 +265,19 @@ public class Reviews extends VerticalLayout {
         menuItemRentInformation.addClickListener(e -> menuItemRentInformation.getUI().ifPresent(ui -> ui.navigate("Information")));
         
         SubMenu subMenuLogin = menuItemLogin.getSubMenu();
-        MenuItem menuItemRegister = subMenuLogin.addItem("Register");
-        menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
+        if (SessionAttributes.getLoggedIn() == null || SessionAttributes.getLoggedIn() == "false") {
+            MenuItem menuItemRegister = subMenuLogin.addItem("Register");
+            menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
+        } else {
+            MenuItem menuItemReservations = subMenuLogin.addItem("Reservations");
+            menuItemReservations.addClickListener(e -> menuItemReservations.getUI().ifPresent(ui -> ui.navigate("ProfileReservations")));
+            MenuItem menuItemLogout = subMenuLogin.addItem("Logout");
+            menuItemLogout.addClickListener(e -> SessionAttributes.logout());
+            menuItemLogout.addClickListener(e -> menuItemLogout.getUI().ifPresent(ui -> ui.navigate("Login")));
+        }
 
-        // If neither admin or employee is logged in, show employee login menu.
-        if((SessionAttributes.getEmployeeLogin()=="false" || SessionAttributes.getEmployeeLogin() == null)&& (SessionAttributes.getAdminLogin()=="false" || SessionAttributes.getAdminLogin()== null)){
+        // If neither admin or employee or another user is logged in, show employee login menu.
+        if((SessionAttributes.getEmployeeLogin()=="false" || SessionAttributes.getEmployeeLogin() == null)&& (SessionAttributes.getAdminLogin()=="false" || SessionAttributes.getAdminLogin()== null) && (SessionAttributes.getLoggedIn()=="false") || SessionAttributes.getLoggedIn()==null){
             MenuItem menuItemEmployeeLogin = subMenuLogin.addItem("Employee login");
             menuItemEmployeeLogin.addClickListener(e -> menuItemEmployeeLogin.getUI().ifPresent(ui -> ui.navigate("employeeLogin")));
         }
@@ -289,5 +306,5 @@ public class Reviews extends VerticalLayout {
             menuItemAdminLogin.addClickListener(e -> menuItemAdminLogin.getUI().ifPresent(ui -> ui.navigate("FAQ")));
         }
         add(header, menuBar);
-    }    
+    }  
 }
