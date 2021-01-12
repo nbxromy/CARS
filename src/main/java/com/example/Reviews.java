@@ -2,6 +2,7 @@ package com.example;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -27,7 +28,6 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 
-
 @Route("Reviews")
 @CssImport("./styles/styles.css")
 public class Reviews extends VerticalLayout {
@@ -41,38 +41,30 @@ public class Reviews extends VerticalLayout {
     public boolean loggedin= false;
 
     public Reviews() {
-        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        H2 title = new H2("Click on a star rating to read");
         setSizeFull();
         addClassName("reviews");
         addHeader();
+        if(SessionAttributes.getLoggedIn()== null || SessionAttributes.getLoggedIn() =="false"){
+            H2 text = new H2("Please log in to write a review");
+            add(text);
+        }
+        else{
+            askReview();
+        }
         retrieveReviews();
-        H2 pageName = new H2("You can write a review on the left and read reviews on the right");
-        pageName.getElement().getThemeList();
-        add(pageName);
-        askReview();
+        add(title);
         viewReviews();
-        
     }
- 
+
     // Form for writing a review
     public void askReview() {
-
-        // Todo: If user is logged in (need credentials for DB table) ->
-        //       different form, without usn/pass
 
         FormLayout reviewLayout = new FormLayout();
         reviewLayout.addClassName("reviewLayout");
         H2 formHeader = new H2("Write a review here"); 
         reviewLayout.add(formHeader);
         reviewLayout.setMaxWidth("30em");
-
-        TextField usernameField = new TextField();
-        usernameField.setLabel("Username");
-        usernameField.setMaxWidth("16em");
-
-        PasswordField passwordField = new PasswordField();
-        passwordField.setLabel("Password");
-        passwordField.setMaxWidth("16em");
 
         TextArea reviewField = new TextArea("Give us a review!");
         reviewField.setPlaceholder("Write here ...");
@@ -89,24 +81,23 @@ public class Reviews extends VerticalLayout {
         
         sendReview.addClickListener(click->{
             if(!((Integer.parseInt(star.getValue())>=1)&(Integer.parseInt(star.getValue())<=5))){
-                Notification.show("Please use a number 1-5 for star rating", 6000, Position.TOP_CENTER);
+                Notification.show("Please use a number 1-5 for star rating", 10000, Position.TOP_CENTER);
             }
-            else if(checkReview(usernameField.getValue(), passwordField.getValue())){
-                Notification.show("You are only aloud to place one review", 6000, Position.TOP_CENTER);
+            else if(checkReview(SessionAttributes.getLoggedUser())){
+                Notification.show("You are only aloud to place one review", 10000, Position.TOP_CENTER);
             }
             
-            else if(checkUser(usernameField.getValue(), passwordField.getValue())){
-                sendReview(usernameField.getValue(), passwordField.getValue(), reviewField.getValue(),star.getValue());
+            else if(checkUser(SessionAttributes.getLoggedUser())){
+                insertReviewTable(SessionAttributes.getLoggedUser().toString(), reviewField.getValue(),star.getValue());
                 Notification.show("Review sent!", 6000, Position.TOP_CENTER);
             }
             else{
-                Notification.show("User credentials are wrong, please try again", 6000, Position.TOP_CENTER);
-                
+                Notification.show("User credentials are wrong, please try again", 10000, Position.TOP_CENTER);
             }
 
         });
 
-        reviewLayout.add(usernameField, passwordField, reviewField,star ,sendReview);
+        reviewLayout.add(reviewField,star ,sendReview);
         reviewLayout.setColspan(reviewField, 2);
         add(reviewLayout);
         
@@ -114,11 +105,11 @@ public class Reviews extends VerticalLayout {
 
     // Checks if the user already has placed a review
 
-    public boolean checkReview(String usn, String passw){
+    public boolean checkReview(String usn){
         boolean userReview = false;
         try{
             Connection conn = DriverManager.getConnection(jdbcURL, jdbcusername, jdbcpassword);
-            String query = "select * from reviewtable where username='"+usn+"' and password='"+passw+"'";
+            String query = "select * from reviewtable where username='"+usn+"'";
             Statement statement = conn.createStatement();
             ResultSet rs = statement.executeQuery(query);
             if(rs.next()){
@@ -136,12 +127,12 @@ public class Reviews extends VerticalLayout {
     }
 
     // Function that'll check if the username and password are valid in DB
-    public boolean checkUser(String username, String password){
+    public boolean checkUser(String username){
         boolean userCred= false;
 
         try{
             Connection conn = DriverManager.getConnection(jdbcURL, jdbcusername, jdbcpassword);
-            String query = "select * from customer where username='"+username+"' and password='"+password+"'";
+            String query = "select * from customers where username='"+username+"'";
             Statement statement = conn.createStatement();
             ResultSet rs = statement.executeQuery(query);
             if(rs.next()){
@@ -159,33 +150,49 @@ public class Reviews extends VerticalLayout {
         return userCred;
     }
 
-    // Function that'll send the review to the DB when the button is pressed.
-    public void sendReview(String usn, String password, String review, String star) {
-
-        try {
-            Application.insertReviewTable(usn, password, review, star);
-        } 
-        catch (Exception e) {
-           System.out.println(e);
-        }
-        
-    }
     
+    // Function below inserts customer review to the review table.
+    public  void insertReviewTable(String usn,String review, String star){
+        if(Integer.parseInt(star)==1){
+            star = "*";
+        }
+        else if (Integer.parseInt(star)==2){
+            star = "* *";
+        }
+        else if(Integer.parseInt(star)==3){
+            star = "* * *";
+        }
+        else if(Integer.parseInt(star)==4){
+            star = "* * * *";
+        }
+        else if(Integer.parseInt(star)==5){
+            star= "* * * * *";
+        }
+
+        try{
+            Connection conn = DriverManager.getConnection(jdbcURL, jdbcusername, jdbcpassword);
+            PreparedStatement insert = conn.prepareStatement("INSERT INTO reviewtable (username, review, star) VALUES ('"+usn+"', '"+review +"','"+ star+"')");
+            insert.executeUpdate();
+            System.out.println("Inserted");
+        }
+        catch(Exception e){
+            System.out.println(e);
+            
+        }
+    }
     // This function will load the reviews in a accordion for view
     public void viewReviews(){
         
         Accordion accordion = new Accordion();
         
         for(int i=0 ; i<arrayReviews.length;i++){
-            accordion.add(arrayReviews[i][0]+"  Stars:"+arrayReviews[i][2], new Span(arrayReviews[i][1])).addThemeVariants(DetailsVariant.FILLED);
+            accordion.add(arrayReviews[i][2], new Span(arrayReviews[i][0]+": "+arrayReviews[i][1])).addThemeVariants(DetailsVariant.FILLED);
         }
         
         add(accordion);
        
     }
-
-    // This function will retrieve the amount of rows in the DB reviewtable
-    // and put the data inside arrayReviews.
+    
     public void retrieveReviews(){
 
         try {
@@ -253,6 +260,36 @@ public class Reviews extends VerticalLayout {
         SubMenu subMenuLogin = menuItemLogin.getSubMenu();
         MenuItem menuItemRegister = subMenuLogin.addItem("Register");
         menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
+
+        // If neither admin or employee is logged in, show employee login menu.
+        if((SessionAttributes.getEmployeeLogin()=="false" || SessionAttributes.getEmployeeLogin() == null)&& (SessionAttributes.getAdminLogin()=="false" || SessionAttributes.getAdminLogin()== null)){
+            MenuItem menuItemEmployeeLogin = subMenuLogin.addItem("Employee login");
+            menuItemEmployeeLogin.addClickListener(e -> menuItemEmployeeLogin.getUI().ifPresent(ui -> ui.navigate("employeeLogin")));
+        }
+        // If employee is logged in, show employee menu
+        MenuItem menuItemEmployee;
+        if(SessionAttributes.getEmployeeLogin() =="true"){
+            menuItemEmployee = menuBar.addItem("Employee");
+            menuItemEmployee.addClickListener(e -> menuItemEmployee.getUI().ifPresent(ui -> ui.navigate("Employee")));
+            MenuItem menuItemEmployeeLogin = subMenuLogin.addItem("Employee log out");
+            menuItemEmployeeLogin.addClickListener(e -> SessionAttributes.employeeLogout());
+            menuItemEmployeeLogin.addClickListener(e -> menuItemEmployeeLogin.getUI().ifPresent(ui -> ui.navigate("FAQ")));
+        }
+        // If admin is logged in, show admin menu
+        MenuItem menuItemAdmin;
+        if(SessionAttributes.getAdminLogin()=="true"){
+            menuItemAdmin = menuBar.addItem("Admin");
+            menuItemAdmin.addClickListener(e -> menuItemAdmin.getUI().ifPresent(ui -> ui.navigate("Admin")));
+            
+            SubMenu subMenuAdmin = menuItemAdmin.getSubMenu();
+            MenuItem menuItemActiveBookings = subMenuAdmin.addItem("Active bookings");
+            menuItemActiveBookings.addClickListener(e -> menuItemAdmin.getUI().ifPresent(ui -> ui.navigate("activeBookings")));
+            MenuItem menuItemFinishedBookings = subMenuAdmin.addItem("Finished bookings");
+            menuItemFinishedBookings.addClickListener(e -> menuItemAdmin.getUI().ifPresent(ui -> ui.navigate("finishedBookings")));
+            MenuItem menuItemAdminLogin = subMenuLogin.addItem("Admin logout");
+            menuItemAdminLogin.addClickListener(e -> SessionAttributes.adminLogout());
+            menuItemAdminLogin.addClickListener(e -> menuItemAdminLogin.getUI().ifPresent(ui -> ui.navigate("FAQ")));
+        }
         add(header, menuBar);
     }    
 }

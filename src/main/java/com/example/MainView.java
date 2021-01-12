@@ -24,6 +24,10 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
 
+import javax.websocket.Session;
+
+import com.example.Admin;
+
 @Route
 @PageTitle("Homepage")
 @PWA(name = "Test Application", shortName = "Test App", description = "This is a test website for Qars.", enableInstallPrompt = false)
@@ -223,12 +227,15 @@ public class MainView extends VerticalLayout {
         menuItemCorona.addClickListener(e -> menuItemCorona.getUI().ifPresent(ui -> ui.navigate("Corona")));
         MenuItem menuItemReview = menuBar.addItem("Reviews");
         menuItemReview.addClickListener(e -> menuItemReview.getUI().ifPresent(ui -> ui.navigate("Reviews")));
+       
+         
         MenuItem menuItemLogin;
         if (SessionAttributes.getLoggedIn() == null || SessionAttributes.getLoggedIn() == "false") {
             menuItemLogin = menuBar.addItem("Login");
             menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
             menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Login")));
-        } else {
+        }
+        else {
             menuItemLogin = menuBar.addItem("Profile");
             menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
             menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Profile")));
@@ -240,15 +247,49 @@ public class MainView extends VerticalLayout {
         menuItemRentInformation.addClickListener(e -> menuItemRentInformation.getUI().ifPresent(ui -> ui.navigate("Information")));
         
         SubMenu subMenuLogin = menuItemLogin.getSubMenu();
+       
+        // If neither admin or employee is logged in, show employee login menu.
+        if((SessionAttributes.getEmployeeLogin()=="false" || SessionAttributes.getEmployeeLogin() == null)&& (SessionAttributes.getAdminLogin()=="false" || SessionAttributes.getAdminLogin()== null)){
+            MenuItem menuItemEmployeeLogin = subMenuLogin.addItem("Employee login");
+            menuItemEmployeeLogin.addClickListener(e -> menuItemEmployeeLogin.getUI().ifPresent(ui -> ui.navigate("employeeLogin")));
+        }
+        // If employee is logged in, show employee menu
+        MenuItem menuItemEmployee;
+        if(SessionAttributes.getEmployeeLogin() =="true"){
+            menuItemEmployee = menuBar.addItem("Employee");
+            menuItemEmployee.addClickListener(e -> menuItemEmployee.getUI().ifPresent(ui -> ui.navigate("Employee")));
+            MenuItem menuItemEmployeeLogin = subMenuLogin.addItem("Employee log out");
+            menuItemEmployeeLogin.addClickListener(e -> SessionAttributes.employeeLogout());
+            menuItemEmployeeLogin.addClickListener(e -> menuItemEmployeeLogin.getUI().ifPresent(ui -> ui.navigate("FAQ")));
+        }
+        // If admin is logged in, show admin menu
+        MenuItem menuItemAdmin;
+        if(SessionAttributes.getAdminLogin()=="true"){
+            menuItemAdmin = menuBar.addItem("Admin");
+            menuItemAdmin.addClickListener(e -> menuItemAdmin.getUI().ifPresent(ui -> ui.navigate("Admin")));
+            
+            SubMenu subMenuAdmin = menuItemAdmin.getSubMenu();
+            MenuItem menuItemActiveBookings = subMenuAdmin.addItem("Active bookings");
+            menuItemActiveBookings.addClickListener(e -> menuItemAdmin.getUI().ifPresent(ui -> ui.navigate("activeBookings")));
+            MenuItem menuItemFinishedBookings = subMenuAdmin.addItem("Finished bookings");
+            menuItemFinishedBookings.addClickListener(e -> menuItemAdmin.getUI().ifPresent(ui -> ui.navigate("finishedBookings")));
+            MenuItem menuItemAdminLogin = subMenuLogin.addItem("Admin logout");
+            menuItemAdminLogin.addClickListener(e -> SessionAttributes.adminLogout());
+            menuItemAdminLogin.addClickListener(e -> menuItemAdminLogin.getUI().ifPresent(ui -> ui.navigate("FAQ")));
+        }
+
+        MenuItem menuItemRegister;
         if (SessionAttributes.getLoggedIn() == null || SessionAttributes.getLoggedIn() == "false") {
-            MenuItem menuItemRegister = subMenuLogin.addItem("Register");
-            menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
-        } else {
+            menuItemRegister= subMenuLogin.addItem("Register");
+            menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));  
+        }        
+        else {
             MenuItem menuItemReservations = subMenuLogin.addItem("Reservations");
             menuItemReservations.addClickListener(e -> menuItemReservations.getUI().ifPresent(ui -> ui.navigate("ProfileReservations")));
             MenuItem menuItemLogout = subMenuLogin.addItem("Logout");
             menuItemLogout.addClickListener(e -> SessionAttributes.logout());
             menuItemLogout.addClickListener(e -> menuItemLogout.getUI().ifPresent(ui -> ui.navigate("Login")));
+            
         }
         add(header, menuBar);
     }

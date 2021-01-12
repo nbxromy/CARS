@@ -1,55 +1,115 @@
 package com.example;
 
-import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
-import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.details.Details;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-@Route(value="FAQ")
-@PageTitle("Frequently Asked Questions")
-@CssImport("./styles/styles.css")
-public class FAQ extends VerticalLayout {
 
+
+@Route("finishedBookings")
+public class finishedBookings extends VerticalLayout{
+    /**
+     *
+     */
     private static final long serialVersionUID = 1L;
+    private String customerUsername;
+    private String beginDate;
+    private String endDate;
+    private String DeliveryDate;
+    private String Amount;
+    private String carLicenseplate;
 
-    public FAQ() {
+   
+    public List<finishedBookings> bookingList = new ArrayList<>();
+
+    public finishedBookings(){
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         setSizeFull();
-        addClassName("faq");
         addHeader();
-        H2 pageName = new H2("Frequently Asked Questions");
+        getBookings();
+        H2 title = new H2("Completed booking list");
+    
+        Grid<finishedBookings> grid = new Grid<>(finishedBookings.class);
+        grid.setItems(bookingList);
+        grid.removeAllColumns();
+        grid.addColumn(finishedBookings::getUsername).setHeader("Customer Username");
+        grid.addColumn(finishedBookings::getCarLicense).setHeader("License plate");
+        grid.addColumn(finishedBookings::getAmount).setHeader("Amount");
+        grid.addColumn(finishedBookings::getBeginDate).setHeader("Begin date");
+        grid.addColumn(finishedBookings::getEndDate).setHeader("End date");
+        grid.addColumn(finishedBookings::getDeliveryDate).setHeader("Delivery date");
 
-        var faq1 = new Details("How do I become a Qars member?", new Text("You become a Qars member when you create your account by"+
-            " navigating to the 'Register' page."));
-        var faq2 = new Details("How old do I have to be to rent a car?", new Text("You have to be at least 21 years old."));
-        var faq3 = new Details("What are the costs to rent a car?", new Text("The costs vary per car, we advise you to check the rental"+
-            " page."));
-        var faq4 = new Details("Can I cancel my booking?", new Text("Qars allows you to cancel your reservation online after it is "+
-            "confirmed, provided it is done up to 48 hours prior to rental time."));
-        var faq5 = new Details("Is it allowed to rent a car for another person?", new Text("That is not allowed."));
-        var faq6 = new Details("Are there any differences or restrictions due to COVID-19?", new Text("Please check the COVID-19 tab."));
-        var faq7 = new Details("When do I have to return the vehicle?", new Text("The vehicle should be return to the Qars station at"+
-            " the latest on the date and time shown on the rental agreement document."));
-        var faq8 = new Details("What do I need to do in the event of loss of keys?", new Text("You will need to contact the Qars station"+
-            " where you rented your car. You can find the contact details on the 'Locations' page."));
-        var faq9 = new Details("What happens if I have a fine?", new Text("In case you have a fine during your rental, you will receive "+
-            "the fine notice from the police or from Qars."));
-        var faq10 = new Details("Do I need to check the condition of the vehicle prior leaving the location?", new Text("Yes, you have to"+
-            " check that the condition report reflects the actual vehicle condition."));
-        add(pageName, faq1,faq2,faq3,faq4,faq5,faq6,faq7,faq8,faq9,faq10);
+        add(title,grid);
     }
 
-    // HEADER
+    public finishedBookings(String usn, String begindate, String enddate,String deliverydate, String amount, String license){
+        super();
+        customerUsername = usn;
+        beginDate = begindate;
+        endDate = enddate;
+        DeliveryDate= deliverydate;
+        Amount = amount;
+        carLicenseplate = license;
+        
+    }
+    public void getBookings(){
+        try{
+
+            Connection conn = DriverManager.getConnection(Application.jdbcURL,Application.username,Application.password);
+            PreparedStatement checkUsnEmail = conn.prepareStatement("SELECT * FROM \"reservations\" WHERE deliverydate is not null ORDER BY username ASC");
+            ResultSet rs = checkUsnEmail.executeQuery();
+            while(rs.next()){
+                String usn = rs.getString(4);
+                String license = rs.getString(3);
+                String amount = rs.getString(10);
+                String begindate= rs.getString(6);
+                String enddate= rs.getString(8);
+                String deliverydate= rs.getString(17);
+                bookingList.add(new finishedBookings(usn,begindate,enddate,deliverydate,amount,license));
+            }
+            conn.close();
+        }
+        catch(Exception e){
+            System.out.println("GetBookings:" +e);
+        }
+    }
+
+    
+    public String getUsername(){
+        return customerUsername;
+    }
+    public String getBeginDate(){
+        return beginDate;
+    }
+    public String getEndDate(){
+        return endDate;
+    }
+    public String getDeliveryDate(){
+        return DeliveryDate;
+    }
+    public String getAmount(){
+        return Amount;
+    }
+    public String getCarLicense(){
+        return carLicenseplate;
+    }
+  
+
+
     public void addHeader() {
         // Header
         H1 header = new H1("QARS");
@@ -71,35 +131,24 @@ public class FAQ extends VerticalLayout {
         menuItemFaq.addClickListener(e -> menuItemFaq.getUI().ifPresent(ui -> ui.navigate("FAQ")));
         MenuItem menuItemCorona = menuBar.addItem("COVID-19");
         menuItemCorona.addClickListener(e -> menuItemCorona.getUI().ifPresent(ui -> ui.navigate("Corona")));
+        MenuItem menuItemLogin = menuBar.addItem("Login");
+        menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
+        menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Login")));
         MenuItem menuItemReview = menuBar.addItem("Reviews");
         menuItemReview.addClickListener(e -> menuItemReview.getUI().ifPresent(ui -> ui.navigate("Reviews")));
-        MenuItem menuItemLogin;
-        if (SessionAttributes.getLoggedIn() == null || SessionAttributes.getLoggedIn() == "false") {
-            menuItemLogin = menuBar.addItem("Login");
-            menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
-            menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Login")));
-        } else {
-            menuItemLogin = menuBar.addItem("Profile");
-            menuItemLogin.addComponentAsFirst(new Icon(VaadinIcon.USER));
-            menuItemLogin.addClickListener(e -> menuItemLogin.getUI().ifPresent(ui -> ui.navigate("Profile")));
-        }
 
         // Menu bar - Sub menu's 
         SubMenu subMenuRent = menuItemRent.getSubMenu();
+        MenuItem menuItemRentACar = subMenuRent.addItem("Rent a car");
+        menuItemRentACar.addClickListener(e -> menuItemRentACar.getUI().ifPresent(ui -> ui.navigate("Rent")));
         MenuItem menuItemRentInformation = subMenuRent.addItem("Information");
         menuItemRentInformation.addClickListener(e -> menuItemRentInformation.getUI().ifPresent(ui -> ui.navigate("Information")));
+        MenuItem menuItemExtras = subMenuRent.addItem("Extra options");
+        menuItemExtras.addClickListener(e -> menuItemExtras.getUI().ifPresent(ui -> ui.navigate("Extras")));
         
         SubMenu subMenuLogin = menuItemLogin.getSubMenu();
-        if (SessionAttributes.getLoggedIn() == null || SessionAttributes.getLoggedIn() == "false") {
-            MenuItem menuItemRegister = subMenuLogin.addItem("Register");
-            menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
-        } else {
-            MenuItem menuItemReservations = subMenuLogin.addItem("Reservations");
-            menuItemReservations.addClickListener(e -> menuItemReservations.getUI().ifPresent(ui -> ui.navigate("ProfileReservations")));
-            MenuItem menuItemLogout = subMenuLogin.addItem("Logout");
-            menuItemLogout.addClickListener(e -> SessionAttributes.logout());
-            menuItemLogout.addClickListener(e -> menuItemLogout.getUI().ifPresent(ui -> ui.navigate("Login")));
-        }
+        MenuItem menuItemRegister = subMenuLogin.addItem("Register");
+        menuItemRegister.addClickListener(e -> menuItemRegister.getUI().ifPresent(ui -> ui.navigate("Register")));
 
         // If neither admin or employee is logged in, show employee login menu.
         if((SessionAttributes.getEmployeeLogin()=="false" || SessionAttributes.getEmployeeLogin() == null)&& (SessionAttributes.getAdminLogin()=="false" || SessionAttributes.getAdminLogin()== null)){

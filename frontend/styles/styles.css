@@ -24,6 +24,7 @@
 } 
 
 /* STYLES REVIEW PAGE */
+/* FORM STYLE FOR REVIEW PAGE*/
 .reviewLayout{
     padding-left: 2em;
     padding-right: 2em;
@@ -32,7 +33,33 @@
     
 }
 
+/*ADMIN PAGE, FORM STYLES*/
+.formAddcar{
+    padding-left: 2em;
+    padding-right: 2em;
+    padding-bottom: 1em;
+    border-style: ridge;
+}
+.formDeletecar{
+    padding-left: 2em;
+    padding-right: 2em;
+    padding-bottom: 1em;
+    border-style: ridge;
+}
+.formEmployee{
+    padding-left: 2em;
+    padding-right: 2em;
+    padding-bottom: 1em;
+    border-style: ridge;
+}
 
+/* EMPLOYEE PAGE STYLE*/
+.empForm{
+    padding-left: 2em;
+    padding-right: 2em;
+    padding-bottom: 1em;
+    border-style: ridge;
+}
 /* STYLES ALL PAGES */
 H1 {
     background-color: #2ca2f5;
