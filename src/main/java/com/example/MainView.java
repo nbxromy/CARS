@@ -1,7 +1,5 @@
 package com.example;
 
-import com.example.Search;
-
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.contextmenu.MenuItem;
@@ -24,10 +22,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
 
-import javax.websocket.Session;
-
-import com.example.Admin;
-
 @Route
 @PageTitle("Homepage")
 @PWA(name = "Test Application", shortName = "Test App", description = "This is a test website for Qars.", enableInstallPrompt = false)
@@ -38,7 +32,7 @@ public class MainView extends VerticalLayout {
 
     private TextField test = new TextField("Enter search term");
 
-
+    //Search function for the homepage, checks for certain keywords and then redirects to the search page if they've been met
     public void Search(){
         test.setSizeFull();
         Button button = new Button("Search");
@@ -104,12 +98,13 @@ public class MainView extends VerticalLayout {
         add(searchBox);
     }
 
+    //The actual home page with the different car types, attributes and rent buttons
     public MainView() {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         setSizeFull();
         addClassName("home");
-        addHeader();
-        Search();
+        addHeader(); //For the menu bar
+        Search(); //Activates the search box
 
         H2 title = new H2("WELCOME!");
         Image logo = new Image("https://i.pinimg.com/564x/29/a8/b5/29a8b5bafb290cc02b1e652e694ac328.jpg", "?");
@@ -117,6 +112,7 @@ public class MainView extends VerticalLayout {
         logo.setMaxWidth("480px");
         H3 header = new H3("To the QARS rental service!");
 
+        //Following section has information on all the cars
         Span dir = new Span("Please click on one of the following cars to make an order");
         Span ACInf = new Span("Opel Agila Berlin; Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
         "Transmission: Manual, Airconditioning: No");
@@ -133,7 +129,7 @@ public class MainView extends VerticalLayout {
         Span MSInf = new Span("Opel Mokka Selection; Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 3, " +
         "Transmission: Automatic, Airconditioning: Yes");
         
-
+        //Following section has pictures of every car, as well as the buttons needed to redirect to the rent pages
         Image OpelAC = new Image("https://media.autoweek.nl/m/m1by14abtkkn_480.jpg", "?");
         OpelAC.setHeight("480px");
         OpelAC.setMaxWidth("700px");
@@ -176,6 +172,8 @@ public class MainView extends VerticalLayout {
         Button b7 = new Button("Rent this car");
         b7.addClickListener(e -> rentCar("Opel Mokka SUV", "434-223-EEE","Rotterdam"));
 
+        //Following section puts all of the above code into individual formlayouts and then adds them to the page so that it looks nice
+        //and even instead of messy
         FormLayout lay = new FormLayout(title);
         FormLayout lay2 = new FormLayout(header);
         FormLayout carimg = new FormLayout(OpelAC, OpelCB);

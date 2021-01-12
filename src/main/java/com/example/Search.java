@@ -9,8 +9,6 @@ import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -19,9 +17,7 @@ import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.PWA;
 
 @Route("Search")
 @CssImport("./styles/styles.css")
@@ -36,10 +32,11 @@ public class Search extends VerticalLayout {
         addHeader();
 
         Button mainButton = new Button("Go back to homepage");
-        mainButton.addClickListener(e -> UI.getCurrent().navigate(""));
+        mainButton.addClickListener(e -> UI.getCurrent().navigate("")); //button that returns to the homepage
         add(mainButton);
 
-        switch(SessionAttributes.getSearchValue().toUpperCase()) {
+        //switch cases for each keyword, redirects the user to the cars that match with their searched term
+        switch(SessionAttributes.getSearchValue().toUpperCase()) { //toUpperCase is necessary so that the search values aren't blocked by case sensitivity
             case "AUTOMATIC":
             TypeA();
             break;
@@ -80,13 +77,13 @@ public class Search extends VerticalLayout {
             case "MOKKA":
             OpelMO();
             break;
-            default:
+            default: //default case that returns a notification if none of the above cases are met
                 Notification.show("Search not found!");
             break;
         }
     }
 
-    public void TypeA(){
+    public void TypeA(){ //page for automatic car types
         Span ZCInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 3, " +
         "Transmission: Automatic, Airconditioning: Yes");
         Span MSInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 3, " +
@@ -111,7 +108,7 @@ public class Search extends VerticalLayout {
         add(img, Inf, buttons);
     }
 
-    public void TypeM(){
+    public void TypeM(){ //page for manual car types
         Span ACInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
         "Transmission: Manual, Airconditioning: No");
         Span CBInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
@@ -169,7 +166,7 @@ public class Search extends VerticalLayout {
 
     }
 
-    public void AC(){
+    public void AC(){ //page for cars with airconditioning
         Span MCInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
         "Transmission: Manual, Airconditioning: Yes");
         Span ASInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 3, Suitcases: 2, " +
@@ -226,7 +223,7 @@ public class Search extends VerticalLayout {
         add(carimg2, Inf2, buttons2, carimg3, Inf3, buttons3, carimg4, Inf4, buttons4);
     }
 
-    public void NoAC(){
+    public void NoAC(){ //page for cars with no air conditioning
         Span ACInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
         "Transmission: Manual, Airconditioning: No");
         Span CBInf = new Span("Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
@@ -251,6 +248,7 @@ public class Search extends VerticalLayout {
         add(carimg, Inf1, buttons);
     }
 
+    //The following functions are for specifically searched cars
     public void OpelAB(){
         Span ACInf = new Span("Opel Agila Berlin; Fuel: Benzine, Passengers: 5, Doors: 5, Suitcases: 1, " +
         "Transmission: Manual, Airconditioning: No");
