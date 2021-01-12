@@ -33,9 +33,9 @@ public class Login extends VerticalLayout {
 
     private static final long serialVersionUID = 1L;
     // Database credentials
-    private String jdbcURL = "jdbc:postgresql://localhost:5432/ProjectC";
+    private String jdbcURL = "jdbc:postgresql://localhost:5432/Test_Project";
     private String jdbcUsername = "postgres";
-    private String jdbcPassword = "asdf";
+    private String jdbcPassword = "asd";
 
     public Login() {
         if (SessionAttributes.getLoggedIn() == null || SessionAttributes.getLoggedIn() == "false") {

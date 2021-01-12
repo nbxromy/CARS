@@ -41,12 +41,17 @@ public class Reviews extends VerticalLayout {
     public boolean loggedin= false;
 
     public Reviews() {
-        H2 title = new H2("Click on a star rating to read a review");
-
+        H2 title = new H2("Click on a star rating to read");
         setSizeFull();
         addClassName("reviews");
         addHeader();
-        askReview();
+        if(SessionAttributes.getLoggedIn()== null || SessionAttributes.getLoggedIn() =="false"){
+            H2 text = new H2("Please log in to write a review");
+            add(text);
+        }
+        else{
+            askReview();
+        }
         retrieveReviews();
         add(title);
         viewReviews();
@@ -60,14 +65,6 @@ public class Reviews extends VerticalLayout {
         H2 formHeader = new H2("Write a review here"); 
         reviewLayout.add(formHeader);
         reviewLayout.setMaxWidth("30em");
-
-        TextField usernameField = new TextField();
-        usernameField.setLabel("Username");
-        usernameField.setMaxWidth("16em");
-
-        PasswordField passwordField = new PasswordField();
-        passwordField.setLabel("Password");
-        passwordField.setMaxWidth("16em");
 
         TextArea reviewField = new TextArea("Give us a review!");
         reviewField.setPlaceholder("Write here ...");
@@ -86,12 +83,12 @@ public class Reviews extends VerticalLayout {
             if(!((Integer.parseInt(star.getValue())>=1)&(Integer.parseInt(star.getValue())<=5))){
                 Notification.show("Please use a number 1-5 for star rating", 10000, Position.TOP_CENTER);
             }
-            else if(checkReview(usernameField.getValue(), passwordField.getValue())){
+            else if(checkReview(SessionAttributes.getLoggedUser())){
                 Notification.show("You are only aloud to place one review", 10000, Position.TOP_CENTER);
             }
             
-            else if(checkUser(usernameField.getValue(), passwordField.getValue())){
-                insertReviewTable(usernameField.getValue(), reviewField.getValue(),star.getValue());
+            else if(checkUser(SessionAttributes.getLoggedUser())){
+                insertReviewTable(SessionAttributes.getLoggedUser().toString(), reviewField.getValue(),star.getValue());
                 Notification.show("Review sent!", 6000, Position.TOP_CENTER);
             }
             else{
@@ -100,7 +97,7 @@ public class Reviews extends VerticalLayout {
 
         });
 
-        reviewLayout.add(usernameField, passwordField, reviewField,star ,sendReview);
+        reviewLayout.add(reviewField,star ,sendReview);
         reviewLayout.setColspan(reviewField, 2);
         add(reviewLayout);
         
@@ -108,11 +105,11 @@ public class Reviews extends VerticalLayout {
 
     // Checks if the user already has placed a review
 
-    public boolean checkReview(String usn, String passw){
+    public boolean checkReview(String usn){
         boolean userReview = false;
         try{
             Connection conn = DriverManager.getConnection(jdbcURL, jdbcusername, jdbcpassword);
-            String query = "select * from reviewtable where username='"+usn+"' and password='"+passw+"'";
+            String query = "select * from reviewtable where username='"+usn+"'";
             Statement statement = conn.createStatement();
             ResultSet rs = statement.executeQuery(query);
             if(rs.next()){
@@ -130,12 +127,12 @@ public class Reviews extends VerticalLayout {
     }
 
     // Function that'll check if the username and password are valid in DB
-    public boolean checkUser(String username, String password){
+    public boolean checkUser(String username){
         boolean userCred= false;
 
         try{
             Connection conn = DriverManager.getConnection(jdbcURL, jdbcusername, jdbcpassword);
-            String query = "select * from customers where username='"+username+"' and password='"+password+"'";
+            String query = "select * from customers where username='"+username+"'";
             Statement statement = conn.createStatement();
             ResultSet rs = statement.executeQuery(query);
             if(rs.next()){
