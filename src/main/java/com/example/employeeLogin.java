@@ -81,6 +81,7 @@ public class employeeLogin extends VerticalLayout{
             UI.getCurrent().getPage().reload();
         }
     }
+    
     public void checkWorker(TextField usernameField, PasswordField passwordField){
         try{
             Connection conn = DriverManager.getConnection(jdbcURL,jdbcusername,jdbcpassword);
@@ -106,6 +107,7 @@ public class employeeLogin extends VerticalLayout{
             System.out.println("Conn failed after check:"+e);
         }
     }
+
     public boolean checkFields(Span error, TextField usernamefield, PasswordField passwordfield){
         
         boolean FieldsFilledIn = false;
@@ -144,9 +146,11 @@ public class employeeLogin extends VerticalLayout{
         }
         return correctCredentials;
     }
+
     public int getEmployeeOrAdmin(){
         return EmployeeOrAdmin;
     }
+
     // HEADER
     public void addHeader() {
         // Header

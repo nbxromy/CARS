@@ -244,7 +244,7 @@ public class Rent extends VerticalLayout {
         // Connect to database and create reservation
         try {
             Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
-            String sql = "INSERT INTO reservations (carname, licenceplate, username, location, pickupdate, pickuptime, "+
+            String sql = "INSERT INTO reservations (carname, licenseplate, username, location, pickupdate, pickuptime, "+
                 "dropoffdate, dropofftime, price, ispaid, gps, insurance, wintertires, extradriver, childseat) VALUES ('"+
                 car+"', '"+licencePlate+"', '"+SessionAttributes.getLoggedUser()+"', '"+pickupLocation+"', '"+pickupDate+
                 "', '"+pickupTime+"', '"+dropoffDate+"', '"+dropoffTime+"', '"+price+"', '"+payed+"', '"+hasGPS+"', '"+

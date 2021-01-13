@@ -7,7 +7,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
@@ -23,9 +22,7 @@ import com.vaadin.flow.router.Route;
 
 @Route("activeBookings")
 public class activeBookings extends VerticalLayout{
-    /**
-     *
-     */
+    
     private static final long serialVersionUID = 1L;
     private String customerUsername;
     private String beginDate;
@@ -33,7 +30,6 @@ public class activeBookings extends VerticalLayout{
     private String deliveryDate;
     private String Amount;
     private String carLicenseplate;
-    
    
     public List<activeBookings> bookingList = new ArrayList<>();
 
@@ -44,7 +40,6 @@ public class activeBookings extends VerticalLayout{
             addHeader();
             getBookings();
             H2 title = new H2("Active booking list");
-        
 
             Grid<activeBookings> grid = new Grid<>(activeBookings.class);
             grid.setItems(bookingList);
@@ -55,15 +50,13 @@ public class activeBookings extends VerticalLayout{
             grid.addColumn(activeBookings::getBeginDate).setHeader("Begin date");
             grid.addColumn(activeBookings::getEndDate).setHeader("End date");
             grid.addColumn(activeBookings::getDeliveryDate).setHeader("Delivery date");
-
             add(title,grid);
         } else {
             UI.getCurrent().navigate("employeeLogin");
             UI.getCurrent().getPage().reload();
         }
     }
-    // Ervoor zorgen dat de row hoogte groter wordt, bij lange tekst (wrap) of css
-    //  http://www.w3schools.com/cssref/css3_pr_word-wrap.asp https://vaadin.com/forum/thread/15297878/15302575
+
     public activeBookings(String usn, String begindate, String enddate,String amount, String license){
         super();
         customerUsername = usn;
@@ -74,6 +67,8 @@ public class activeBookings extends VerticalLayout{
         carLicenseplate = license;
         
     }
+
+    // Function will retrieve bookings and turn them into objects for grid
     public void getBookings(){
         try{
 
@@ -96,7 +91,7 @@ public class activeBookings extends VerticalLayout{
         }
     }
 
-    
+    // Getters
     public String getUsername(){
         return customerUsername;
     }

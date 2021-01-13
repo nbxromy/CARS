@@ -84,13 +84,9 @@ public class Reviews extends VerticalLayout {
             else if(checkReview(SessionAttributes.getLoggedUser())){
                 Notification.show("You are only aloud to place one review", 10000, Position.TOP_CENTER);
             }
-            
-            else if(checkUser(SessionAttributes.getLoggedUser())){
+            else{
                 insertReviewTable(SessionAttributes.getLoggedUser().toString(), reviewField.getValue(),star.getValue());
                 Notification.show("Review sent!", 6000, Position.TOP_CENTER);
-            }
-            else{
-                Notification.show("User credentials are wrong, please try again", 10000, Position.TOP_CENTER);
             }
 
         });
@@ -122,30 +118,6 @@ public class Reviews extends VerticalLayout {
             System.out.println(e);
         }
         return userReview;
-    }
-
-    // Function that'll check if the username and password are valid in DB
-    public boolean checkUser(String username){
-        boolean userCred= false;
-
-        try{
-            Connection conn = DriverManager.getConnection(jdbcURL, jdbcusername, jdbcpassword);
-            String query = "select * from customers where username='"+username+"'";
-            Statement statement = conn.createStatement();
-            ResultSet rs = statement.executeQuery(query);
-            if(rs.next()){
-                userCred = true;
-            }
-            else{
-                userCred= false;
-            }
-            conn.close();
-        }
-
-        catch(Exception e){
-            System.out.println(e);
-        }
-        return userCred;
     }
 
     

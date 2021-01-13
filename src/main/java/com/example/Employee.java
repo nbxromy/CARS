@@ -40,9 +40,10 @@ public class Employee extends VerticalLayout{
             ui = this.getUI().isPresent() ? this.getUI().get() : UI.getCurrent();
             isEmployee= true;
             addHeader();
-        
             employeeForm();
-        } else {
+        } 
+        else 
+        {
             UI.getCurrent().navigate("employeeLogin");
             UI.getCurrent().getPage().reload();
         }
@@ -133,7 +134,7 @@ public class Employee extends VerticalLayout{
             if(rs.next()){
                 PreparedStatement updateDeliverydate = conn.prepareStatement("UPDATE reservations set deliverydate='"+currentdate+"' WHERE licenseplate='"+license+"' and pickupdate<'"+currentdate+"' and deliverydate is null");
                 updateDeliverydate.executeUpdate();
-               
+ 
                 PreparedStatement updateCar = conn.prepareStatement("UPDATE \"Cars\" SET mileage="+newMileage +" WHERE \"licensePlate\"='"+license+"'");
                 updateCar.executeUpdate();
                 conn.close();

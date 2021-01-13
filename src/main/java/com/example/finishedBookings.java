@@ -73,6 +73,7 @@ public class finishedBookings extends VerticalLayout{
         carLicenseplate = license;
         
     }
+    
     public void getBookings(){
         try{
 

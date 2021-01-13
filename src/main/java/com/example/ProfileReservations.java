@@ -114,7 +114,7 @@ public class ProfileReservations extends VerticalLayout {
             ResultSet resultset = statement.executeQuery(sql);
             while (resultset.next()) {
                 reservationList.add(new Reservation(resultset.getString("orderid"), resultset.getString("carname"),
-                    resultset.getString("licenceplate"), resultset.getString("username"), resultset.getString("location"), 
+                    resultset.getString("licenseplate"), resultset.getString("username"), resultset.getString("location"), 
                     LocalDate.parse(resultset.getString("pickupdate")), LocalTime.parse(resultset.getString("pickuptime")), 
                     LocalDate.parse(resultset.getString("dropoffdate")), LocalTime.parse(resultset.getString("dropofftime")), 
                     "€"+resultset.getString("price")+",00", resultset.getString("ispaid"), resultset.getString("gps"), 

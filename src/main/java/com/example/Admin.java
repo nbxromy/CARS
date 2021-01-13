@@ -35,7 +35,7 @@ public class Admin extends VerticalLayout{
 
     private static final long serialVersionUID = 1L;
     private static boolean isAdmin;
-    private boolean isEmp;
+    private UI ui;
 
     public Admin(){
         if (SessionAttributes.getAdminLogin() == "true" || SessionAttributes.getAdminLogin() != null) {
@@ -48,6 +48,7 @@ public class Admin extends VerticalLayout{
             UI.getCurrent().navigate("employeeLogin");
             UI.getCurrent().getPage().reload();
         }
+        ui = this.getUI().isPresent() ? this.getUI().get() : UI.getCurrent();
     }
     
     public static boolean getAdmin(){
@@ -111,6 +112,7 @@ public class Admin extends VerticalLayout{
         add(form);
     }
 
+    // Form for creating an employee
     public void formCreateEmployee(){
 
         FormLayout form = new FormLayout();
@@ -137,12 +139,12 @@ public class Admin extends VerticalLayout{
         form.add(title,Usn,Pass,checkPass,Email,Number,cityZip,Address,Birthdate,codeWorker,buttonCreate);
 
         buttonCreate.addClickListener(click->{
-            if((Usn.getValue()=="")||(Pass.getValue()=="")||(checkPass.getValue()=="")|| (Email.getValue()=="")||(Number.getValue()=="")||(cityZip.getValue()=="")||(Address.getValue()=="")||(Birthdate.getValue()==null)){
-                Notification.show("Fill in all fields", 5000, Position.TOP_CENTER);
-               
+            if(Usn.isEmpty()||Pass.isEmpty()||checkPass.isEmpty()||Email.isEmpty()||Number.isEmpty()||cityZip.isEmpty()||Address.isEmpty()||Birthdate.isEmpty()){
+                ui.access(()->Notification.show("Fill in all fields!", 20000, Position.TOP_CENTER));
+    
             }
-            // Still unable to show notification when account is created
-            else{ 
+            
+            else{
                 if(!checkPass.getValue().equals(Pass.getValue())){
                     Notification.show("Passwords do not match", 5000, Position.TOP_CENTER);
                 }
@@ -151,24 +153,22 @@ public class Admin extends VerticalLayout{
                 }
                 else{
                     if(createEmployee(Usn.getValue(), Pass.getValue(), Email.getValue(), Number.getValue(),cityZip.getValue(), Address.getValue(), Birthdate.getValue(), codeWorker.getValue())){
-                        Notification.show("Account created!", 5000, Position.TOP_CENTER);
                     }
                     else{
-                        //Notification.show("Failed", 5000, Position.TOP_CENTER);
+                        ui.access(()->Notification.show("Failed to create!", 10000, Position.TOP_CENTER));
                     }
-                    //  Notification.show("Account created!", 5000, Position.TOP_CENTER);
-                }
+                } 
             }
         });
         add(form);
     }
 
+    
     public boolean createEmployee(String usn, String pass, String email, String number, String cityZip, String address, LocalDate bday, String code){
         boolean created= false;
         try{
-
             Connection conn = DriverManager.getConnection(Application.jdbcURL,Application.username,Application.password);
-            PreparedStatement checkUsnEmail = conn.prepareStatement("SELECT * FROM \"Workers\" WHERE username='"+usn+"' OR email='"+email+"'");
+            PreparedStatement checkUsnEmail = conn.prepareStatement("SELECT * FROM \"workers\" WHERE username='"+usn+"' OR email='"+email+"'");
             ResultSet rs = checkUsnEmail.executeQuery();
 
             if(rs.next()){
@@ -176,9 +176,10 @@ public class Admin extends VerticalLayout{
                 created= false;
             }
             else{
-                PreparedStatement insertWorker = conn.prepareStatement("INSERT INTO \"Workers\" VALUES ('"+usn+"', '"+ pass+"', '"+code +"','"+ cityZip+"', '"+address +"','"+ bday+"','"+number+"','"+ email+"')");
-                insertWorker.executeQuery();
-                Notification.show("Account created!", 5000, Position.TOP_CENTER);
+                PreparedStatement insertWorker = conn.prepareStatement("INSERT INTO \"workers\" VALUES ('"+usn+"', '"+ pass+"', '"+code +"','"+ cityZip+"', '"+address +"','"+ bday+"','"+number+"','"+ email+"')");
+                insertWorker.executeUpdate();
+                ui.access(()->Notification.show("Account created!", 10000, Position.TOP_CENTER));
+                
                 
                 created =true;
                 
@@ -193,8 +194,8 @@ public class Admin extends VerticalLayout{
 
   
 
-    // Function for inserting car to database
-    // Checks if licenseplate already exists
+    // Function for adding car to database
+    
 
     public void sendCar(int model,int mileage ,String license, String location){
         try{
@@ -219,13 +220,12 @@ public class Admin extends VerticalLayout{
         }
     }
     
-    // Function to delete car from database
-    // Checks if license plate exists
+    // Function to delete car from database, checks if licenseplate exists
+    
 
     public void deleteCar(String licenseplate){
         try{
-            Connection conn = DriverManager.getConnection(Application.jdbcURL,Application.username,Application.password);
-            
+            Connection conn = DriverManager.getConnection(Application.jdbcURL,Application.username,Application.password);      
             PreparedStatement checkLicense = conn.prepareStatement("select * from \"Cars\" WHERE \"licensePlate\"='"+ licenseplate+ "'");
             ResultSet rs = checkLicense.executeQuery();
             if(rs.next()){
